@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { Icon } from 'react-native-elements';
 import { logOut } from '../../services/AuthService';
 import { ChatterUpText } from './ChatterUpText';
 
@@ -30,22 +31,34 @@ export class MainMenu extends React.Component {
     render() {
         return (
             <View style={styles.container}>
-                <View>
-                    <View style={styles.buttonRow}>
-                        <TouchableOpacity style={[styles.menuButtonLeft, styles.chatButton]}>
-                            <ChatterUpText textValue={'chat'}></ChatterUpText>
-                        </TouchableOpacity>
-                        <TouchableOpacity style={[styles.menuButtonRight, styles.profileButton]}>
-                            <ChatterUpText textValue={'profile'}></ChatterUpText>
-                        </TouchableOpacity>
+                <View style={{flex: 1}}>
+                    <View style={[styles.buttonRow, styles.topButtonRow]}>
+                        <View style={styles.buttonWrapper}>
+                            <TouchableOpacity style={[styles.button, styles.menuButtonLeft, styles.chatButton]}>
+                                <Icon size={72} name='phone' type='font-awesome' color='#efefef' />
+                                <ChatterUpText style={styles.buttonText} textValue={'chat'}></ChatterUpText>
+                            </TouchableOpacity>
+                        </View>
+                        <View style={styles.buttonWrapper}>
+                            <TouchableOpacity style={[styles.button, styles.menuButtonRight, styles.profileButton]}>
+                                <Icon size={72} name='user' type='font-awesome' color='#efefef' />
+                                <ChatterUpText style={styles.buttonText} textValue={'profile'}></ChatterUpText>
+                            </TouchableOpacity>
+                        </View>
                     </View>
                     <View style={styles.buttonRow}>
-                        <TouchableOpacity style={[styles.menuButtonLeft, styles.supportButton]}>
-                            <ChatterUpText textValue={'support'}></ChatterUpText>
-                        </TouchableOpacity>
-                        <TouchableOpacity style={[styles.menuButtonRight, styles.logOutButton]}>
-                            <ChatterUpText textValue={'log out'}></ChatterUpText>
-                        </TouchableOpacity>
+                        <View style={styles.buttonWrapper}>
+                            <TouchableOpacity style={[styles.button, styles.menuButtonLeft, styles.supportButton]}>
+                                <Icon size={72} name='question' type='font-awesome' color='#efefef' />
+                                <ChatterUpText style={styles.buttonText} textValue={'support'}></ChatterUpText>
+                            </TouchableOpacity>
+                        </View>
+                        <View style={styles.buttonWrapper}>
+                            <TouchableOpacity style={[styles.button, styles.menuButtonRight, styles.logOutButton]}>
+                                <Icon size={72} name='arrow-right' type='font-awesome' color='#efefef' />
+                                <ChatterUpText style={styles.buttonText} textValue={'log out'}></ChatterUpText>
+                            </TouchableOpacity>
+                        </View>
                     </View>
                 </View>
             </View>
@@ -55,32 +68,48 @@ export class MainMenu extends React.Component {
 
 const styles = StyleSheet.create({
     container: {
+        flex: 1,
         alignItems: 'center'
     },
     title: {
-        fontSize: 24
+        fontSize: 28
     },
     buttonRow: {
+       width: '100%',
         flexDirection: 'row'
     },
+    topButtonRow: {
+        marginBottom: 10
+    },  
+    buttonWrapper: {
+        flex: 1
+    },
+    buttonText: {
+        fontSize: 32
+    },
+    button: {
+        paddingTop: 10,
+        paddingBottom: 10,
+        alignItems: 'center'
+    },
     menuButtonLeft: {
-      marginLeft: 10,  
-      marginRight: 5
+        marginLeft: 10,  
+        marginRight: 5
     },
     menuButtonRight: {
         marginLeft: 5,
         marginRight: 10
     },
     chatButton: {
-
+        backgroundColor: 'green'
     },
     profileButton: {
-
+        backgroundColor: 'blue'
     },
     supportButton: {
-
+        backgroundColor: 'purple'
     },
     logOutButton: {
-
+        backgroundColor: '#555'
     }
 });

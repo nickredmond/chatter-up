@@ -40,7 +40,7 @@ export class Home extends React.Component {
     render() {
         return (
             <View style={styles.container}>
-                <Text style={styles.title}>chatter up</Text>
+                <Text style={styles.title}>talk it out</Text>
 
                 <View style={styles.homePageContent}>
                     {
