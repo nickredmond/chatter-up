@@ -32,10 +32,10 @@ export class Home extends React.Component {
         this.setState({ isAuthenticated: false });
     }
 
-    // goToTables = () => {
-    //     const { navigate } = this.props.navigation;
-    //     navigate('TablesList');
-    // }
+    goTo = (viewName) => {
+        const { navigate } = this.props.navigation;
+        navigate(viewName);
+    }
 
     render() {
         return (
@@ -43,11 +43,6 @@ export class Home extends React.Component {
                 <Text style={styles.title}>talk it out</Text>
 
                 <View style={styles.homePageContent}>
-                    {
-                        this.state.isDonationProcessed && 
-                        <Text style={styles.donationSuccessMessage}>Your donation has successfully been submitted.</Text>
-                    }
-
                     {
                         this.state.isLoading && 
                         <View style={styles.loadingContainer}>
@@ -58,7 +53,7 @@ export class Home extends React.Component {
                     {
                         this.state.isAuthenticated && 
                         <MainMenu 
-                            // goToTables={this.goToTables} 
+                            goTo={this.goTo}
                             loggedOut={this.loggedOut}>
                         </MainMenu>
                     }
@@ -94,7 +89,7 @@ const styles = StyleSheet.create({
     homePageContent: {
         flex: 1,
         alignItems: 'center',
-        marginTop: 25
+        marginTop: 20
     },
     donationSuccessMessage: {
         color: '#3c763d',
