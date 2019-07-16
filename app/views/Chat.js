@@ -46,12 +46,21 @@ export class Chat extends React.Component {
     }
 
     renderList = ({ item: user }) => {
-        const truncatedName = user.username.length > 18 ? user.username.substring(0, 18) + '...' : user.username;
+        const truncatedName = user.username.length > 16 ? user.username.substring(0, 15) + '...' : user.username;
         const coolPoints = user.coolPoints ? this.abbreviateNumber(user.coolPoints) : 0;
         const badges = user.badges ? this.abbreviateNumber(user.badges) : 0;
 
         return (
             <TouchableOpacity style={styles.userItem} onPress={() => this.userSelected(user.username)}>
+                {
+                    user.isOnline &&
+                    <Icon size={22} name='circle' type='font-awesome' color='#77ff88' />
+                }
+                {
+                    !user.isOnline &&
+                    <Icon size={22} name='circle' type='font-awesome' color='#999' />
+                }
+                
                 <Text style={styles.userItemText}>{ truncatedName }</Text>
                 <View style={styles.statContainer}>
                     <Icon size={24} name='thumbs-up' type='font-awesome' color='#222' />
@@ -105,8 +114,9 @@ const styles = StyleSheet.create({
     },
     userItemText: {
         flex: 1,
-        fontSize: 22,
-        color: '#222'
+        fontSize: 20,
+        color: '#222',
+        marginLeft: 10
     },
     statContainer: {
         flexDirection: 'row',
