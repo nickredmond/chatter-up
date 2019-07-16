@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Icon } from 'react-native-elements';
 import { logOut } from '../../services/AuthService';
 import { ChatterUpText } from './ChatterUpText';
+import { ChatterUpLoadingSpinner } from './ChatterUpLoadingSpinner';
 import { getRandomQuote } from '../../services/ChatterUpService';
 
 export class MainMenu extends React.Component {
@@ -68,6 +69,11 @@ export class MainMenu extends React.Component {
                         </View>
                     </View>
                 </View>
+                {
+                    !(this.state && this.state.quote) && 
+                    <ChatterUpLoadingSpinner></ChatterUpLoadingSpinner>
+                }
+
                 {
                     this.state && this.state.quote &&
                     <View style={styles.quoteContainer}>
