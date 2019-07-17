@@ -115,3 +115,31 @@ export const getUsers = () => {
         }, 1000);
     })
 }
+
+export const getUserProfileInfo = (username) => {
+    return new Promise((resolve, reject) => {
+        setTimeout(() => {
+            resolve({
+                username,
+                isOnline: true,
+                lastOnline: null, // Date
+                coolPoints: 1097,
+                badges: [
+                    {
+                        icon: 'ear',
+                        name: 'Good Listener',
+                        description: 'Makes an effort to listen attentively without interrupting.'
+                    },
+                    {
+                        icon: 'mountain',
+                        name: 'A-Player',
+                        description: 'Has taken at least 50 calls, and has spent ample time with many calls.'
+                    }
+                ],
+                about: 'I just love trolling people and making them feel bad about themselves... jk. ' + 
+                    'I\'ve been told I\'m a pretty cool dude, and I like talking with people because sometimes people ' + 
+                    'have interesting things to say. Other times, not so much.'
+            })
+        }, 1000);
+    })
+}
