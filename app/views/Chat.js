@@ -24,7 +24,7 @@ export class Chat extends React.Component {
     }
 
     userSelected = (username) => {
-        // todo: navigate to user profile
+        this.props.navigation.navigate('UserProfile', { username });
     }
 
     // CREDIT: found at https://stackoverflow.com/questions/10599933
