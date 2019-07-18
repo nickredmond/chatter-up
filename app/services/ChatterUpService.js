@@ -121,8 +121,8 @@ export const getUserProfileInfo = (username) => {
         setTimeout(() => {
             resolve({
                 username,
-                isOnline: true,
-                lastOnline: null, // Date
+                isOnline: false,
+                lastOnline: new Date(2019, 5, 29), // Date, else null if online
                 coolPoints: 1097,
                 badges: [
                     {

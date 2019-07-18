@@ -5,6 +5,7 @@ import { ChatterUpText } from './partial/ChatterUpText';
 import { ChatterUpLoadingSpinner } from './partial/ChatterUpLoadingSpinner';
 import { getUserProfileInfo } from '../services/ChatterUpService';
 import { TouchableOpacity } from 'react-native-gesture-handler';
+import moment from 'moment';
 
 export class UserProfile extends React.Component {
     constructor(props) {
@@ -22,24 +23,48 @@ export class UserProfile extends React.Component {
         );
     }
 
+    getPhoneButtonStyles = (isOnline) => {
+        const phoneStyles = [styles.phoneButton];
+        const statusStyle = isOnline ? styles.enabledPhoneButton : styles.disabledPhoneButton;
+        phoneStyles.push(statusStyle);
+        return phoneStyles;
+    }
+
     getCoolPointsText = () => {
         return this.state.userInfo.coolPoints + ' cool points earned.';
     }
 
     getLastOnlineText = () => {
-        return null; // todo: use timeAgo w/ lastOnline date prop
+        return 'last online ' + moment(this.state.userInfo.lastOnline).fromNow();
     }
 
-    onBadgePress = (badge) => {
-        // todo: show modal/overlay with badge info
+    badgePressed = (badge) => {
+        this.setState({ selectedBadge: badge });
+    }
+
+    dismissBadgeInfo = () => {
+        this.setState({ selectedBadge: null });
+    }
+
+    getBadgeColor = (badgeName) => {
+        alert('eh')
+        const isSelectedBadge = this.state.selectedBadge && this.state.selectedBadge.name === badgeName;
+        if (isSelectedBadge) {alert('booya')}
+        return isSelectedBadge ? '#88ff88' : '#efefef';
     }
 
     renderBadge = ({ item: badge }) => {
         const iconName = badge.icon;
         
         return (
-            <TouchableOpacity onPress={() => this.onBadgePress(badge)}>
-                <Icon size={60} style={styles.badgeIcon} name={iconName} type='material' color='#efefef'></Icon>
+            <TouchableOpacity onPress={() => this.badgePressed(badge)}>
+                <Icon 
+                    size={60} 
+                    style={styles.badgeIcon} 
+                    name={iconName} 
+                    type='material' 
+                    color={'#efefef'}>
+                </Icon>
             </TouchableOpacity>
         );
     }
@@ -73,7 +98,10 @@ export class UserProfile extends React.Component {
                         </View>
                         <View style={styles.buttonsContainer}>
                             <View style={styles.buttonWrapper}>
-                                <TouchableOpacity style={styles.phoneButton}>
+                                <TouchableOpacity 
+                                    style={this.getPhoneButtonStyles(this.state.userInfo.isOnline)}
+                                    disabled={!this.state.userInfo.isOnline}
+                                    >
                                     <Icon size={48} name='phone' type='font-awesome' color='#efefef' />
                                 </TouchableOpacity>
                             </View>
@@ -94,10 +122,33 @@ export class UserProfile extends React.Component {
                                 renderItem={this.renderBadge}>
                             </FlatList>
                         </View>
-                        <View style={[styles.subContainer, styles.aboutMeContainer]}>
-                            <Text style={styles.sectionTitle}>ABOUT ME</Text>
-                            <Text style={styles.aboutMeText}>{ this.state.userInfo.about }</Text>
-                        </View>
+
+                        {
+                            this.state && this.state.selectedBadge && 
+                            <View style={[styles.subContainer, styles.badgeInfoContainer]}>
+                                <View style={styles.badgeInfoNameContainer}>
+                                    <Icon 
+                                        size={28} 
+                                        style={styles.badgeInfoIcon}
+                                        name={this.state.selectedBadge.icon} 
+                                        type='material' 
+                                        color={'#222'}>
+                                    </Icon>
+                                    <Text style={styles.badgeInfoName}>{this.state.selectedBadge.name}</Text>
+                                </View>
+                                <Text style={styles.badgeInfoDescription}>{this.state.selectedBadge.description}</Text>
+                                <TouchableOpacity style={styles.badgeDismissButton} onPress={() => this.dismissBadgeInfo()}>
+                                    <Text style={styles.badgeDismissText}>ok</Text>
+                                </TouchableOpacity>
+                            </View>
+                        }
+                        {
+                            this.state && !this.state.selectedBadge && 
+                            <View style={[styles.subContainer, styles.aboutMeContainer]}>
+                                <Text style={styles.sectionTitle}>ABOUT ME</Text>
+                                <Text style={styles.aboutMeText}>{ this.state.userInfo.about }</Text>
+                            </View>
+                        }
                     </View>
                 }
             </View>
@@ -136,10 +187,15 @@ const styles = StyleSheet.create({
         flex: 1
     },
     phoneButton: {
-        backgroundColor: 'green',
         marginRight: 5,
         paddingTop: 10,
         paddingBottom: 5
+    },
+    enabledPhoneButton: {
+        backgroundColor: 'green'
+    },
+    disabledPhoneButton: {
+        backgroundColor: '#555'
     },
     chatButton: {
         backgroundColor: 'blue',
@@ -183,5 +239,45 @@ const styles = StyleSheet.create({
     aboutMeText: {
         color: '#efefef',
         fontSize: 18
+    },
+    badgeInfoContainer: {
+        flex: 4,
+        margin: 15,
+        paddingLeft: 15,
+        paddingRight: 15,
+        alignSelf: 'stretch',
+        backgroundColor: '#ddd'
+    },
+    badgeInfoNameContainer: {
+        flexDirection: 'row',
+        alignSelf: 'stretch',
+        justifyContent: 'center',
+        paddingTop: 10
+    },
+    badgeInfoIcon: {
+        paddingTop: 10
+    },
+    badgeInfoName: {
+        color: '#222',
+        fontSize: 24,
+        marginLeft: 10,
+        marginBottom: 5
+    },
+    badgeInfoDescription: {
+        color: '#444',
+        fontSize: 18,
+        textAlign: 'center'
+    },
+    badgeDismissButton: {
+        backgroundColor: '#555',
+        paddingLeft: 25,
+        paddingRight: 25,
+        paddingTop: 5,
+        paddingBottom: 5,
+        marginTop: 10
+    },
+    badgeDismissText: {
+        color: '#efefef',
+        fontSize: 22
     }
 });
