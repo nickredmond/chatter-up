@@ -52,7 +52,7 @@ export const authenticate = () => {
 }
 
 export const saveAuthResponseData = (username, response, resolve, reject) => {
-    AsyncStorage.setItem('player-name', username, (err) => {
+    AsyncStorage.setItem('username', username, (err) => {
         if (err) {
             reject('Error saving to device storage.');
         }
@@ -194,4 +194,17 @@ export const setLastLogin = () => {
             }
         });
     })
+}
+
+export const getCurrentUsername = () => {
+    return new Promise((resolve, reject) => {
+        AsyncStorage.getItem('username', (err, username) => {
+            if (err) {
+                reject('Error reading values from device.');
+            }
+            else {
+                resolve(username);
+            }
+        })
+    });
 }

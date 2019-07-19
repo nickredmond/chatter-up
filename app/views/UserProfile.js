@@ -17,7 +17,7 @@ export class UserProfile extends React.Component {
             userInfo => {
                 this.setState({ userInfo, isLoading: false });
             },
-            errorMessage => { // remember: pass errorMessage in all error scenarios from svc
+            errorMessage => { 
                 alert(errorMessage);
             }
         );
@@ -36,6 +36,11 @@ export class UserProfile extends React.Component {
 
     getLastOnlineText = () => {
         return 'last online ' + moment(this.state.userInfo.lastOnline).fromNow();
+    }
+
+    chatButtonPressed = () => {
+        const username = this.state.userInfo.username;
+        this.props.navigation.navigate('InstantMessage', { username });
     }
 
     badgePressed = (badge) => {
@@ -106,7 +111,7 @@ export class UserProfile extends React.Component {
                                 </TouchableOpacity>
                             </View>
                             <View style={styles.buttonWrapper}>
-                                <TouchableOpacity style={styles.chatButton}>
+                                <TouchableOpacity style={styles.chatButton} onPress={() => this.chatButtonPressed()}>
                                     <Icon size={48} name='comment' type='font-awesome' color='#efefef' />
                                 </TouchableOpacity>
                             </View>

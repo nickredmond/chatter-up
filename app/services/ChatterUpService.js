@@ -168,3 +168,40 @@ export const getUserProfileInfo = (username) => {
         }, 1);
     })
 }
+
+export const getMessages = (username) => {
+    return new Promise((resolve, reject) => {
+        resolve([
+            {
+                'sentBy': username,
+                'dateSent': new Date("2019/07/15 07:31:22"),
+                'content': 'Hey Nick, hows it going?'
+            },
+            {
+                'sentBy': username,
+                'dateSent': new Date("2019/07/16 09:42:11"),
+                'content': '...u sure about that?'
+            },
+            {
+                'sentBy': 'theonetruenick',
+                'dateSent': new Date("2019/07/15 07:37:45"),
+                'content': 'eh I think ill be all right, thanks 4 asking!'
+            },
+            {
+                'sentBy': username,
+                'dateSent': new Date("2019/07/15 07:37:00"),
+                'content': 'u wanna talk about it?'
+            },
+            {
+                'sentBy': 'theonetruenick',
+                'dateSent': new Date("2019/07/15 07:32:22"),
+                'content': 'oh hey its going all right. just bored.'
+            },
+            {
+                'sentBy': 'theonetruenick',
+                'dateSent': new Date("2019/07/17 13:21:27"),
+                'content': 'dude leave me alone ;)'
+            }
+        ])
+    })
+}

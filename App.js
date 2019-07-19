@@ -2,6 +2,11 @@ import { createStackNavigator, createAppContainer } from 'react-navigation';
 import { Home } from './app/views/Home';
 import { Chat } from './app/views/Chat';
 import { UserProfile } from './app/views/UserProfile';
+import { InstantMessage } from './app/views/InstantMessage';
+
+const getTrimmedUsernameTitle = (username) => {
+  return username.length > 16 ? username.substring(0, 15) + '...' : username;
+};
 
 const AppRoutes = createStackNavigator(
   {
@@ -10,11 +15,13 @@ const AppRoutes = createStackNavigator(
     UserProfile: {
       screen: UserProfile,
       navigationOptions: ({ navigation }) => ({
-        title: `${
-          navigation.state.params.username.length > 16 ? 
-          navigation.state.params.username.substring(0, 15) + '...' : 
-          navigation.state.params.username
-        }`
+        title: getTrimmedUsernameTitle(navigation.state.params.username)
+      })
+    },
+    InstantMessage: {
+      screen: InstantMessage,
+      navigationOptions: ({ navigation }) => ({
+        title: getTrimmedUsernameTitle(navigation.state.params.username)
       })
     }
   },
