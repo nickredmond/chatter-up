@@ -3,6 +3,7 @@ import { View, StyleSheet, TouchableOpacity, Text, FlatList } from 'react-native
 import { Icon } from 'react-native-elements';
 import { ChatterUpLoadingSpinner } from './partial/ChatterUpLoadingSpinner';
 import { getUsers } from '../services/ChatterUpService';
+import { OnlineStatusDot } from './partial/OnlineStatusDot';
 
 export class Chat extends React.Component {
     static navigationOptions = {
@@ -52,14 +53,7 @@ export class Chat extends React.Component {
 
         return (
             <TouchableOpacity style={styles.userItem} onPress={() => this.userSelected(user.username)}>
-                {
-                    user.isOnline &&
-                    <Icon size={22} name='circle' type='font-awesome' color='#77ff88' />
-                }
-                {
-                    !user.isOnline &&
-                    <Icon size={22} name='circle' type='font-awesome' color='#999' />
-                }
+                <OnlineStatusDot isOnline={user.isOnline}></OnlineStatusDot>
                 
                 <Text style={styles.userItemText}>{ truncatedName }</Text>
                 <View style={styles.statContainer}>

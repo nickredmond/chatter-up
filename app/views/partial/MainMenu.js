@@ -41,14 +41,19 @@ export class MainMenu extends React.Component {
                 <View style={styles.buttonsContainer}>
                     <View style={[styles.buttonRow, styles.topButtonRow]}>
                         <View style={styles.buttonWrapper}>
-                            <TouchableOpacity style={[styles.button, styles.menuButtonLeft, styles.chatButton]} 
-                                onPress={() => this.props.goTo('Chat')}>
+                            <TouchableOpacity 
+                                style={[styles.button, styles.menuButtonLeft, styles.chatButton]} 
+                                onPress={() => this.props.goTo('Chat')}
+                                >
                                 <Icon size={72} name='phone' type='font-awesome' color='#efefef' />
                                 <ChatterUpText style={styles.buttonText} textValue={'chat'}></ChatterUpText>
                             </TouchableOpacity>
                         </View>
                         <View style={styles.buttonWrapper}>
-                            <TouchableOpacity style={[styles.button, styles.menuButtonRight, styles.messagesButton]}>
+                            <TouchableOpacity 
+                                style={[styles.button, styles.menuButtonRight, styles.messagesButton]} 
+                                onPress={() => this.props.goTo('Messages')}
+                                >
                                 <Icon size={72} name='comment' type='font-awesome' color='#efefef' />
                                 <ChatterUpText style={styles.buttonText} textValue={'messages'}></ChatterUpText>
                             </TouchableOpacity>

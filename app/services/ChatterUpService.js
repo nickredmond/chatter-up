@@ -16,7 +16,7 @@ export const sendAuthenticatedRequest = (path, body) => {
                     response => {
                         if (response.ok) {
                             response.json().then(responseBody => {
-                                resolve(responseBody.users);
+                                resolve(responseBody);
                             });
                         }
                         else {
@@ -204,4 +204,49 @@ export const getMessages = (username) => {
             }
         ])
     })
+}
+
+export const getMessageLists = () => {
+    return new Promise((resolve, reject) => {
+        setTimeout(() => {
+            resolve([
+                {
+                    'username': 'somepotato',
+                    'isOnline': true,
+                    'lastMessageDate': new Date('2019/07/16 13:22:27'),
+                    'lastMessagePreview': 'I really couldn\'t tell you but'
+                },
+                {
+                    'username': 'abcmeanderingaroundwithit',
+                    'isOnline': false,
+                    'lastMessageDate': new Date('2019/07/20 04:10:44'),
+                    'lastMessagePreview': 'wow i really didnt know that wa'
+                },
+                {
+                    'username': 'fairytalewonder',
+                    'isOnline': false,
+                    'lastMessageDate': new Date('2019/07/14 06:22:00'),
+                    'lastMessagePreview': 'now when you get going like tha'
+                },
+                {
+                    'username': 'halo_master_99',
+                    'isOnline': false,
+                    'lastMessageDate': new Date('2019/05/04 19:00:16'),
+                    'lastMessagePreview': 'lol me too!!'
+                },
+                {
+                    'username': 'rgso35',
+                    'isOnline': true,
+                    'lastMessageDate': new Date('2019/07/19 17:20:30'),
+                    'lastMessagePreview': 'well theres really not a whole'
+                },
+                {
+                    'username': 'justanotherreallylongusername',
+                    'isOnline': false,
+                    'lastMessageDate': new Date('2019/06/23 09:10:27'),
+                    'lastMessagePreview': 'thats what I was thinking!'
+                }
+            ]);
+        }, 1);
+    });
 }
