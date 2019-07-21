@@ -9,6 +9,10 @@ const getTrimmedUsernameTitle = (username) => {
   return username.length > 16 ? username.substring(0, 15) + '...' : username;
 };
 
+const getUserProfileTitle = (navigationParams) => {
+  return navigationParams.isCurrentUser ? 'profile' : getTrimmedUsernameTitle(navigationParams.username);
+}
+
 const AppRoutes = createStackNavigator(
   {
     Home,
@@ -17,7 +21,7 @@ const AppRoutes = createStackNavigator(
     UserProfile: {
       screen: UserProfile,
       navigationOptions: ({ navigation }) => ({
-        title: getTrimmedUsernameTitle(navigation.state.params.username)
+        title: getUserProfileTitle(navigation.state.params)
       })
     },
     InstantMessage: {

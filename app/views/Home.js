@@ -32,9 +32,14 @@ export class Home extends React.Component {
         this.setState({ isAuthenticated: false });
     }
 
-    goTo = (viewName) => {
+    goTo = (viewName, navigationParams) => {
         const { navigate } = this.props.navigation;
-        navigate(viewName);
+        if (navigationParams) {
+            navigate(viewName, navigationParams);
+        }
+        else {
+            navigate(viewName);
+        }
     }
 
     render() {

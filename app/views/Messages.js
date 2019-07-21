@@ -29,6 +29,10 @@ export class Messages extends React.Component {
         )
     }
 
+    messagePreviewPressed = (username) => {
+        this.props.navigation.navigate('InstantMessage', { username });
+    }
+
     renderList = ({ item: messagePreview }) => {
         const dateSentText = moment(messagePreview.lastMessageDate).fromNow();
         let previewText = messagePreview.lastMessagePreview;
@@ -41,7 +45,10 @@ export class Messages extends React.Component {
         }
 
         return (
-            <TouchableOpacity style={styles.messagePreviewBubble}>
+            <TouchableOpacity 
+                style={styles.messagePreviewBubble} 
+                onPress={() => this.messagePreviewPressed(messagePreview.username)}
+                >
                 <View style={styles.messagePreviewHeader}>
                     <OnlineStatusDot 
                         containerStyle={styles.statusDot} 

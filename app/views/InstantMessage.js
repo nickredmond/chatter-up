@@ -35,7 +35,6 @@ export class InstantMessage extends React.Component {
             this.setState({
                 otherUsername,
                 messages: formattedMessages,
-                defaultText: 'Enter message to send...',
                 isLoading: false
             });
         },
@@ -149,8 +148,7 @@ export class InstantMessage extends React.Component {
                     {messages}
                     </ScrollView>
                     <InputBar onSendPressed={(inputText) => this._sendMessage(inputText)} 
-                            onSizeChange={() => this._onInputSizeChange()}
-                            defaultText={this.state.defaultText}/>
+                            onSizeChange={() => this._onInputSizeChange()} />
                     <KeyboardSpacer/>             
                 </View>
             }
@@ -198,7 +196,7 @@ class MessageBubble extends React.Component {
 class InputBar extends React.Component {
     constructor(props) {
         super(props);
-        this.state = { inputText: this.props.defaultText };
+        this.state = { inputText: '' };
     }
 
     textChanged = (text) => {
@@ -206,6 +204,7 @@ class InputBar extends React.Component {
     }
 
     submitPressed = () => {
+        this.setState({ inputText: '' });
         this.props.onSendPressed(this.state.inputText);
     }
 
@@ -218,6 +217,7 @@ class InputBar extends React.Component {
                 defaultHeight={30}
                 onChangeText={(text) => this.textChanged(text)}
                 onContentSizeChange={this.props.onSizeChange}
+                placeholder={'Enter message to send...'}
                 value={this.state.inputText}/>
             <TouchableHighlight style={styles.sendButton} onPress={() => this.submitPressed()}>
                 <Text style={{color: 'white'}}>Send</Text>

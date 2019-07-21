@@ -61,7 +61,10 @@ export class MainMenu extends React.Component {
                     </View>
                     <View style={styles.buttonRow}>
                         <View style={styles.buttonWrapper}>
-                            <TouchableOpacity style={[styles.button, styles.menuButtonLeft, styles.profileButton]}>
+                            <TouchableOpacity 
+                                style={[styles.button, styles.menuButtonLeft, styles.profileButton]}
+                                onPress={() => this.props.goTo('UserProfile', { isCurrentUser: true })}
+                                >
                                 <Icon size={72} name='user' type='font-awesome' color='#efefef' />
                                 <ChatterUpText style={styles.buttonText} textValue={'profile'}></ChatterUpText>
                             </TouchableOpacity>
