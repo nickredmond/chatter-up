@@ -250,3 +250,22 @@ export const getMessageLists = () => {
         }, 1);
     });
 }
+
+export const doesUsernameExist = (username) => {
+    return new Promise((resolve, reject) => {
+        resolve(false);
+    })
+}
+
+// todo: maybe get these from server so they may updated on the fly? 
+export const getReportCategories = () => {
+    return new Promise((resolve) => {
+        resolve([
+            'belittling',
+            'shaming',
+            'doxxing',
+            'trolling',
+            'other'
+        ]);
+    })
+}

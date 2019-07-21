@@ -4,6 +4,8 @@ import { Chat } from './app/views/Chat';
 import { Messages } from './app/views/Messages';
 import { UserProfile } from './app/views/UserProfile';
 import { InstantMessage } from './app/views/InstantMessage';
+import { Support } from './app/views/support/Support';
+import { Report } from './app/views/support/Report';
 
 const getTrimmedUsernameTitle = (username) => {
   return username.length > 16 ? username.substring(0, 15) + '...' : username;
@@ -18,6 +20,10 @@ const AppRoutes = createStackNavigator(
     Home,
     Chat,
     Messages,
+
+    Support,
+    Report,
+
     UserProfile: {
       screen: UserProfile,
       navigationOptions: ({ navigation }) => ({

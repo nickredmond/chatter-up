@@ -70,7 +70,10 @@ export class MainMenu extends React.Component {
                             </TouchableOpacity>
                         </View>
                         <View style={styles.buttonWrapper}>
-                            <TouchableOpacity style={[styles.button, styles.menuButtonRight, styles.supportButton]}>
+                            <TouchableOpacity 
+                                style={[styles.button, styles.menuButtonRight, styles.supportButton]}
+                                onPress={() => this.props.goTo('Support')}
+                                >
                                 <Icon size={72} name='question' type='font-awesome' color='#efefef' />
                                 <ChatterUpText style={styles.buttonText} textValue={'support'}></ChatterUpText>
                             </TouchableOpacity>
