@@ -10,14 +10,15 @@ export class ChatterUpLoadingSpinner extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            loadingMessage: this.props.loadingMessage
+            loadingMessage: this.props.loadingMessage,
+            indicatorColor: this.props.color || '#efefef'
         };
     }
 
     render() {
         return (
             <View style={styles.loadingView}>
-                <ActivityIndicator size='large' color='#efefef' />
+                <ActivityIndicator size='large' color={this.state.indicatorColor} />
                 {
                     this.state && this.state.loadingMessage && 
                     <ChatterUpText style={styles.loadingText} textValue={this.state.loadingMessage}></ChatterUpText>
