@@ -204,8 +204,11 @@ class InputBar extends React.Component {
     }
 
     submitPressed = () => {
-        this.setState({ inputText: '' });
-        this.props.onSendPressed(this.state.inputText);
+        const inputText = this.state.inputText;
+        if (inputText) {
+            this.setState({ inputText: '' });
+            this.props.onSendPressed(this.state.inputText);
+        }
     }
 
   render() {
