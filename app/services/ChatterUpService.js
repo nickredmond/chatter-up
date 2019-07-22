@@ -253,7 +253,10 @@ export const getMessageLists = () => {
 
 export const doesUsernameExist = (username) => {
     return new Promise((resolve, reject) => {
-        resolve(false);
+        setTimeout(() => {
+            const result = Math.random() >= 0.5;
+            resolve(result);
+        }, 500);
     })
 }
 
@@ -267,5 +270,13 @@ export const getReportCategories = () => {
             'trolling',
             'other'
         ]);
+    })
+}
+
+export const submitUserReport = (userReport) => {
+    return new Promise((resolve, reject) => {
+        setTimeout(() => {
+            resolve();
+        }, 2000);
     })
 }

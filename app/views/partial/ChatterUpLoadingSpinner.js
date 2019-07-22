@@ -11,14 +11,28 @@ export class ChatterUpLoadingSpinner extends React.Component {
         super(props);
         this.state = {
             loadingMessage: this.props.loadingMessage,
-            indicatorColor: this.props.color || '#efefef'
+            indicatorColor: this.props.color || '#efefef',
+            indicatorSize: this.props.size || 'large'
         };
+    }
+
+    getViewStyle = () => {
+        const style = {
+            padding: 10,
+            alignItems: 'center'
+        };
+        if (!this.props.withoutMargin) {
+            style.marginTop = 25;
+            style.marginBottom = 25;
+        }
+
+        return style;
     }
 
     render() {
         return (
-            <View style={styles.loadingView}>
-                <ActivityIndicator size='large' color={this.state.indicatorColor} />
+            <View style={this.getViewStyle()}>
+                <ActivityIndicator size={this.state.indicatorSize} color={this.state.indicatorColor} />
                 {
                     this.state && this.state.loadingMessage && 
                     <ChatterUpText style={styles.loadingText} textValue={this.state.loadingMessage}></ChatterUpText>
@@ -29,12 +43,6 @@ export class ChatterUpLoadingSpinner extends React.Component {
 }
 
 const styles = StyleSheet.create({
-    loadingView: {
-        marginTop: 25,
-        marginBottom: 25,
-        padding: 10,
-        alignItems: 'center'
-    },
     loadingText: {
         fontSize: 18
     },

@@ -263,7 +263,7 @@ export class Login extends React.Component {
                             <Text style={styles.buttonText}>log in</Text>
                         </TouchableOpacity>
                         <View style={styles.formFooter}>
-                            <ChatterUpText style={styles.footerText} textValue={'Never played before?'}></ChatterUpText>
+                            <ChatterUpText style={styles.footerText} textValue={'New kid on the block?'}></ChatterUpText>
                             <TouchableOpacity onPress={() => this.setNewUser(true)}>
                                 <ChatterUpText style={styles.link} textValue={'sign up'}></ChatterUpText>
                             </TouchableOpacity>

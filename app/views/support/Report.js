@@ -1,27 +1,33 @@
 import React from 'react';
 import { View, StyleSheet, Picker, Text, Keyboard } from 'react-native';
 import { TouchableOpacity, TextInput } from 'react-native-gesture-handler';
-import { doesUsernameExist, getReportCategories } from '../../services/ChatterUpService';
+import { doesUsernameExist, getReportCategories, submitUserReport } from '../../services/ChatterUpService';
 import { ChatterUpLoadingSpinner } from '../partial/ChatterUpLoadingSpinner';
 import { Icon } from 'react-native-elements';
 
 export class Report extends React.Component {
+    static navigationOptions = {
+        title: 'report user'
+    };
+
     constructor(props) {
         super(props);
         this.state = { 
-            isShowingDisclaimer: false,//true,
+            isShowingDisclaimer: true,
             canDimissDisclaimer: false,
-            usernameFound: true 
+            usernameFound: null,
+            username: '',
+            defaultCategory: 'Select category...'
         };
 
         // todo: maybe provide option after first time to not show again
         setTimeout(() => {
             this.setState({ canDimissDisclaimer: true });
-        }, 5000);
+        }, 5000); 
 
         getReportCategories().then(
             categories => {
-                const categoriesWithDefault = ['Select category...'].concat(categories);
+                const categoriesWithDefault = [this.state.defaultCategory].concat(categories);
                 this.setState({ categories: categoriesWithDefault });
             },
             errorMessage => {
@@ -49,15 +55,23 @@ export class Report extends React.Component {
     }
 
     usernameValueChanged = (username) => {
-        this.setState({ username });
+        this.setState({ 
+            username, 
+            usernameRequired: false,
+            usernameFound: null 
+        });
     }
 
     checkUsernameValue = () => {
         const username = this.state.username;
         if (username) {
+            this.setState({ searchingUsername: true });
             doesUsernameExist(username).then(
                 wasUsernameFound => {
-                    this.setState({ usernameFound: wasUsernameFound })
+                    this.setState({ 
+                        usernameFound: wasUsernameFound,
+                        searchingUsername: false
+                    });
                 },
                 errorMessage => {
                     alert(errorMessage);
@@ -67,7 +81,7 @@ export class Report extends React.Component {
     }
 
     reportCategoryChanged = (selectedCategory) => {
-        this.setState({ selectedCategory });
+        this.setState({ selectedCategory, categoryRequired: false });
     }
 
     getReportCategoryItems = () => {
@@ -86,11 +100,36 @@ export class Report extends React.Component {
     }
 
     descriptionChanged = (description) => {
-        this.setState({ description });
+        this.setState({ description, descriptionRequired: false });
     }
 
     submitButtonPressed = () => {
+        const usernameRequired = !this.state.username;
+        const categoryRequired = this.state.selectedCategory === this.state.defaultCategory || !this.state.selectedCategory;
+        const descriptionRequired = !this.state.description;
+        const isFormSubmitted = !(usernameRequired || categoryRequired || descriptionRequired);
 
+        this.setState({
+            usernameRequired,
+            categoryRequired,
+            descriptionRequired,
+            isFormSubmitted
+        });
+
+        if (isFormSubmitted) {
+            submitUserReport({
+                username: this.state.username,
+                category: this.state.selectedCategory,
+                description: this.state.description
+            }).then(
+                () => {
+                    this.props.navigation.navigate('ReportConfirmed');
+                },
+                errorMessage => {
+                    alert(errorMessage);
+                }
+            );
+        }
     }
 
     render() {
@@ -113,36 +152,60 @@ export class Report extends React.Component {
                                 </TouchableOpacity>
                             </View>
                         }
-                        {
-                            !this.state.canDimissDisclaimer && 
-                            <View style={styles.disclaimerLoadingSpinner}>
-                                <ChatterUpLoadingSpinner color={'#856404'}></ChatterUpLoadingSpinner>
-                            </View>
-                        }
                     </View>
                 }
 
                 {
-                    !this.state.isShowingDisclaimer && !this.state.isEditingDescription &&
+                    !this.state.isShowingDisclaimer && !this.state.isEditingDescription && 
                     <View style={styles.shortFormContainer}>
                         <Text style={[styles.inputLabel, styles.usernameInputLabel]}>{'username being reported'}</Text>
                         <View style={styles.usernameInputGroup}>
                             <TextInput 
+                                value={this.state.username}
                                 style={[styles.input, styles.usernameInput]}
                                 onChangeText={this.usernameValueChanged}
                                 placeholder={'Enter username...'}
                                 placeholderTextColor={'#888'}>
                             </TextInput>
-                            <TouchableOpacity 
-                                style={styles.usernameCheckButton}
-                                onPress={this.checkUsernameValue}
-                                >
-                                <Text style={styles.usernameCheckButtonText}>{'check'}</Text>
-                            </TouchableOpacity>
+                            {
+                                !this.state.searchingUsername && this.state.usernameFound === null &&
+                                <TouchableOpacity 
+                                    style={[styles.usernameCheckButton, styles.enabledCheckButton]}
+                                    onPress={this.checkUsernameValue} 
+                                    >
+                                    <Text style={styles.usernameCheckButtonText}>{'check'}</Text>
+                                </TouchableOpacity>
+                            }
+                            {
+                                !this.state.searchingUsername && this.state.usernameFound === false && 
+                                <TouchableOpacity disabled style={[styles.usernameCheckButton, styles.disabledCheckButton]}>
+                                    <Text style={styles.usernameCheckButtonText}>{'check'}</Text>
+                                </TouchableOpacity>
+                            }
+                            {
+                                !this.state.searchingUsername && this.state.usernameFound === true && 
+                                <TouchableOpacity disabled style={[styles.usernameCheckButton, styles.foundCheckButton]}>
+                                    <Icon size={24} name='check' style='font-awesome'></Icon>
+                                </TouchableOpacity>
+                            }
+                            {
+                                this.state.searchingUsername && 
+                                <TouchableOpacity disabled style={[styles.usernameCheckButton, styles.disabledCheckButton]}>
+                                    <ChatterUpLoadingSpinner size={'small'} withoutMargin={true}></ChatterUpLoadingSpinner>
+                                </TouchableOpacity>
+                            }
                         </View>
                         {
-                            !this.state.usernameFound && 
-                            <Text style={styles.usernameNotFoundMessage}>{this.getUsernameNotFoundMessage()}</Text>
+                            (this.state.usernameFound === false) && 
+                            <Text style={styles.validationMessage}>{this.getUsernameNotFoundMessage()}</Text>
+                        }
+                        {
+                            (this.state.usernameFound === true) && 
+                            <Text style={styles.usernameFoundMessage}>{'Username found.'}</Text>
+                        }
+                        {
+                            this.state.usernameRequired && 
+                            <Text style={styles.validationMessage}>{'Username is required.'}</Text>
                         }
                     </View>
                 }
@@ -160,6 +223,10 @@ export class Report extends React.Component {
                                 { this.getReportCategoryItems() }
                             </Picker>
                         }
+                        {
+                            this.state.categoryRequired && 
+                            <Text style={styles.validationMessage}>{'Category is required.'}</Text>
+                        }
                     </View>
                 }
                 {
@@ -171,8 +238,12 @@ export class Report extends React.Component {
                             multiline={true} 
                             textAlignVertical='top' 
                             onFocus={this.descriptionInputFocused} 
-                            onValueChange={(value) => this.descriptionChanged(value)}>
+                            onChangeText={(value) => this.descriptionChanged(value)}>
                         </TextInput>
+                        {
+                            this.state.descriptionRequired && 
+                            <Text style={styles.validationMessage}>{'Description is required.'}</Text>
+                        }
 
                         {
                             this.state.isEditingDescription && 
@@ -186,10 +257,14 @@ export class Report extends React.Component {
                     </View>
                 }
                 {
-                    !(this.state.isShowingDisclaimer || this.state.isEditingDescription) && 
+                    !(this.state.isShowingDisclaimer || this.state.isEditingDescription || this.state.isFormSubmitted) && 
                     <TouchableOpacity style={styles.submitButton} onPress={this.submitButtonPressed}>
                         <Text style={styles.submitButtonText}>{'submit'}</Text>
                     </TouchableOpacity>
+                }
+                {
+                    this.state.isFormSubmitted && 
+                    <ChatterUpLoadingSpinner></ChatterUpLoadingSpinner>
                 }
             </View>
         );
@@ -293,17 +368,32 @@ const styles = StyleSheet.create({
         fontSize: 18
     },  
     usernameCheckButton: {
-        backgroundColor: 'blue',
         padding: 5
+    },
+    enabledCheckButton: {
+        backgroundColor: 'blue'
+    },
+    disabledCheckButton: {
+        backgroundColor: '#444'
+    },
+    foundCheckButton: {
+        backgroundColor: '#aaddaa'
     },
     usernameCheckButtonText: {
         color: '#efefef',
         fontSize: 20
     },
-    usernameNotFoundMessage: {
+    validationMessage: {
         color: '#efcccc',
+        alignSelf: 'flex-start',
         paddingLeft: 10,
         paddingRight: 10,
+        paddingTop: 5
+    },
+    usernameFoundMessage: {
+        color: '#ccefcc',
+        alignSelf: 'flex-start',
+        paddingLeft: 10,
         paddingTop: 5
     },
     pickerStyle: {
@@ -311,5 +401,22 @@ const styles = StyleSheet.create({
         marginLeft: 10,
         marginRight: 10,
         marginTop: 5
+    },
+    submitButton: {
+        flexDirection: 'row',
+        backgroundColor: '#ddd',
+        borderColor: '#aaa',
+        borderRadius: 2,
+        borderWidth: 1,
+        justifyContent: 'center',
+        paddingTop: 20,
+        paddingBottom: 20,
+        paddingLeft: 25,
+        paddingRight: 25,
+        marginBottom: 20
+    },
+    submitButtonText: {
+        color: '#222',
+        fontSize: 24
     }
 });

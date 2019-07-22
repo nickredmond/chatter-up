@@ -420,15 +420,18 @@ const styles = StyleSheet.create({
         textAlign: 'center'
     },
     badgeDismissButton: {
-        backgroundColor: '#555',
+        backgroundColor: '#ccc',
+        borderColor: '#aaa',
+        borderRadius: 2,
+        borderWidth: 1,
         paddingLeft: 25,
         paddingRight: 25,
         paddingTop: 5,
         paddingBottom: 5,
-        marginTop: 10
+        marginTop: 15
     },
     badgeDismissText: {
-        color: '#efefef',
+        color: '#222',
         fontSize: 22
     }
 });

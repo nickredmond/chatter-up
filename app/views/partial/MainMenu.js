@@ -94,8 +94,8 @@ export class MainMenu extends React.Component {
                 }
                 <View style={{flexDirection: 'row'}}>
                     <TouchableOpacity style={styles.logOutButton} onPress={() => this.logOut()}>
-                        <Icon size={36} name='arrow-right' type='font-awesome' color='#efefef' />
-                        <ChatterUpText style={[styles.buttonText, styles.logOutButtonText]} textValue={'log out'}></ChatterUpText>
+                        <Icon size={36} name='arrow-right' type='font-awesome' color='#222' />
+                        <Text style={[styles.buttonText, styles.logOutButtonText]}>{'log out'}</Text>
                     </TouchableOpacity>
                 </View>
             </View>
@@ -177,7 +177,10 @@ const styles = StyleSheet.create({
     logOutButton: {
         flex: 1,
         flexDirection: 'row',
-        backgroundColor: '#555',
+        backgroundColor: '#ddd',
+        borderColor: '#aaa',
+        borderRadius: 2,
+        borderWidth: 1,
         justifyContent: 'center',
         paddingTop: 10,
         paddingBottom: 10,
@@ -186,6 +189,7 @@ const styles = StyleSheet.create({
         marginBottom: 20
     },
     logOutButtonText: {
-        marginLeft: 10
+        marginLeft: 10,
+        color: '#222'
     }
 });
