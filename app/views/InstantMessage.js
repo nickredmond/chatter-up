@@ -3,7 +3,7 @@ import { ChatterUpLoadingSpinner } from './partial/ChatterUpLoadingSpinner';
 import { Text, View, StyleSheet, ScrollView, KeyboardAvoidingView, TextInput, TouchableHighlight, Keyboard } from 'react-native';
 import KeyboardSpacer from 'react-native-keyboard-spacer';
 import AutogrowInput from 'react-native-autogrow-input';
-import { getMessages } from '../services/ChatterUpService';
+import { getUsername, getMessages, openChatConnection, sendMessage } from '../services/ChatterUpService';
 
 /**
  * These components were originally written by GitHub user @llamaluvr and were published at 
@@ -14,16 +14,48 @@ import { getMessages } from '../services/ChatterUpService';
 export class InstantMessage extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { isLoading: true };
+    this.state = {
+        otherUsername,
+        messages: []
+    };
+
+    getUsername().then(
+        username => {
+            this.setState({ username });
+        },
+        errorMessage => { 
+            alert(errorMessage);
+        }
+    );
     
+    const channelId = this.props.navigation.getParam('channelId');
     const otherUsername = this.props.navigation.getParam('username');
-    getMessages(otherUsername).then(
+    if (channelId) {
+        this.state = { channelId, isLoading: true };
+        getExistingMessages(channelId);
+    }
+    else {
+        // todo: should this be loading too? maybe not cuz some users are fresh? 
+        openChatConnection(otherUsername).then(
+            channelId => {
+                this.setState({ channelId });
+                getExistingMessages(channelId);
+            },
+            errorMessage => {
+                alert(errorMessage);
+            }
+        );
+    }
+  }
+
+  getExistingMessages = (channelId) => {
+    getMessages(channelId).then(
         messages => {
             messages.sort((a, b) => a.dateSent - b.dateSent);
             const formattedMessages = [];
 
             for(var i = 0; i < messages.length; i++) {
-                const direction = messages[i].sentBy === otherUsername ? 'left' : 'right';
+                const direction = messages[i].sentBy === this.state.otherUsername ? 'left' : 'right';
 
                 formattedMessages.push({
                     direction,
@@ -33,7 +65,6 @@ export class InstantMessage extends React.Component {
             }
 
             this.setState({
-                otherUsername,
                 messages: formattedMessages,
                 isLoading: false
             });
@@ -91,20 +122,12 @@ export class InstantMessage extends React.Component {
     };
     this.setState({ messages: this.state.messages.concat([uiMessage]) });
 
-    const userMessage = {
-        sentBy: 'theonetruenick', // todo: get current username
-        dateSent: new Date(),
-        content: sanitizedText
-    };
-    // todo: send to server, Pusher
-    setTimeout(() => {
-        const fakeMessage = {
-            direction: 'left',
-            dateSent: new Date(),
-            text: 'response! :D'
+    sendMessage(sanitizedText).then(
+        _ => {},
+        errorMessage => {
+            alert(errorMessage);
         }
-        this.setState({ messages: this.state.messages.concat([fakeMessage]) })
-    }, 1000);
+    );
   }
 
   //This event fires way too often.

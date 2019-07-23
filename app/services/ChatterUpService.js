@@ -20,18 +20,34 @@ export const sendAuthenticatedRequest = (path, body) => {
                             });
                         }
                         else {
-                            reject(null);
+                            response.json().then(responseBody => {
+                                const errorMessage = responseBody.errorMessage || 'Error sending request.';
+                                reject(errorMessage);
+                            });
                         }
                     },
                     _ => {
-                        reject(null);
+                        reject('There was a problem communicating with server');
                     }
                 )
             },
             _ => {
-                reject('Problem reading from device storage.');
+                reject('There was a problem reading from device storage.');
             }
         );
+    });
+}
+
+export const getUsername = () => {
+    return new Promise((resolve, reject) => {
+        AsyncStorage.getItem('username', (err, username) => {
+            if (err) {
+                reject('Error reading from device storage.');
+            }
+            else {
+                resolve(username);
+            }
+        });
     });
 }
 
@@ -169,41 +185,16 @@ export const getUserProfileInfo = (username) => {
     })
 }
 
-export const getMessages = (username) => {
-    return new Promise((resolve, reject) => {
-        resolve([
-            {
-                'sentBy': username,
-                'dateSent': new Date("2019/07/15 07:31:22"),
-                'content': 'Hey Nick, hows it going?'
-            },
-            {
-                'sentBy': username,
-                'dateSent': new Date("2019/07/16 09:42:11"),
-                'content': '...u sure about that?'
-            },
-            {
-                'sentBy': 'theonetruenick',
-                'dateSent': new Date("2019/07/15 07:37:45"),
-                'content': 'eh I think ill be all right, thanks 4 asking!'
-            },
-            {
-                'sentBy': username,
-                'dateSent': new Date("2019/07/15 07:37:00"),
-                'content': 'u wanna talk about it?'
-            },
-            {
-                'sentBy': 'theonetruenick',
-                'dateSent': new Date("2019/07/15 07:32:22"),
-                'content': 'oh hey its going all right. just bored.'
-            },
-            {
-                'sentBy': 'theonetruenick',
-                'dateSent': new Date("2019/07/17 13:21:27"),
-                'content': 'dude leave me alone ;)'
-            }
-        ])
-    })
+export const openChatConnection = (username) => {
+    return sendAuthenticatedRequest('/chat/connect', { username });
+}
+
+export const getMessages = (channelId) => {
+    return sendAuthenticatedRequest('/chat/messages', { channelId });
+}
+
+export const sendMessage = (message) => {
+    return sendAuthenticatedRequest('/chat/message', { message })
 }
 
 export const getMessageLists = () => {
@@ -213,36 +204,42 @@ export const getMessageLists = () => {
                 {
                     'username': 'somepotato',
                     'isOnline': true,
+                    'channelId': 'asdfds232131',
                     'lastMessageDate': new Date('2019/07/16 13:22:27'),
                     'lastMessagePreview': 'I really couldn\'t tell you but'
                 },
                 {
                     'username': 'abcmeanderingaroundwithit',
                     'isOnline': false,
+                    'channelId': 'asdfds232131',
                     'lastMessageDate': new Date('2019/07/20 04:10:44'),
                     'lastMessagePreview': 'wow i really didnt know that wa'
                 },
                 {
                     'username': 'fairytalewonder',
                     'isOnline': false,
+                    'channelId': 'asdfds232131',
                     'lastMessageDate': new Date('2019/07/14 06:22:00'),
                     'lastMessagePreview': 'now when you get going like tha'
                 },
                 {
                     'username': 'halo_master_99',
                     'isOnline': false,
+                    'channelId': 'asdfds232131',
                     'lastMessageDate': new Date('2019/05/04 19:00:16'),
                     'lastMessagePreview': 'lol me too!!'
                 },
                 {
                     'username': 'rgso35',
                     'isOnline': true,
+                    'channelId': 'asdfds232131',
                     'lastMessageDate': new Date('2019/07/19 17:20:30'),
                     'lastMessagePreview': 'well theres really not a whole'
                 },
                 {
                     'username': 'justanotherreallylongusername',
                     'isOnline': false,
+                    'channelId': 'asdfds232131',
                     'lastMessageDate': new Date('2019/06/23 09:10:27'),
                     'lastMessagePreview': 'thats what I was thinking!'
                 }
