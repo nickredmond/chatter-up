@@ -1,29 +1,34 @@
+import { AsyncStorage } from 'react-native';
 import { getApiUrl } from '../shared/Constants';
 import { getUserToken } from './AuthService';
 
-export const sendAuthenticatedRequest = (path, body) => {
+export const sendAuthenticatedRequest = (path, body, hasResponse) => {
     return new Promise((resolve, reject) => {
         getUserToken().then(
             token => {
-                body.token = token; 
+                const requestBody = body || {};
+                requestBody.token = token; 
                 fetch(getApiUrl() + path, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify(body)
+                    body: JSON.stringify(requestBody)
                 }).then(
                     response => {
                         if (response.ok) {
-                            response.json().then(responseBody => {
-                                resolve(responseBody);
-                            });
+                            const parseResponse = (hasResponse !== false);
+                            if (parseResponse) {
+                                response.json().then(responseBody => {
+                                    resolve(responseBody);
+                                });
+                            }
+                            else {
+                                resolve(true);
+                            }
                         }
                         else {
-                            response.json().then(responseBody => {
-                                const errorMessage = responseBody.errorMessage || 'Error sending request.';
-                                reject(errorMessage);
-                            });
+                            reject('There was a problem communicating with server');
                         }
                     },
                     _ => {
@@ -63,73 +68,7 @@ export const getRandomQuote = () => {
 }
 
 export const getUsers = () => {
-    // todo: get up to 5 most recently connected, then up to 5 "random" online, then fill in with random
-    return new Promise((resolve, reject) => {
-        setTimeout(() => {
-            resolve([
-                {
-                    isOnline: true,
-                    username: 'rgso35',
-                    coolPoints: 1097,
-                    badges: 2
-                },
-                {
-                    isOnline: false,
-                    username: 'somedude',
-                    coolPoints: 47,
-                    badges: 0
-                },
-                {
-                    isOnline: false,
-                    username: 'everylittlethingshedoesismagic',
-                    coolPoints: 35,
-                    badges: 1
-                },
-                {
-                    isOnline: true,
-                    username: 'ellisBellis33',
-                    coolPoints: 1200,
-                    badges: 0
-                },
-                {
-                    isOnline: false,
-                    username: 'anonymousSquirrel',
-                    coolPoints: 9723,
-                    badges: 7
-                },
-                {
-                    isOnline: true,
-                    username: 'JessieJames',
-                    coolPoints: 88,
-                    badges: 2
-                },
-                {
-                    isOnline: true,
-                    username: '99redballoons',
-                    coolPoints: 72,
-                    badges: 0
-                },
-                {
-                    isOnline: false,
-                    username: 'dudesareweird',
-                    coolPoints: 613,
-                    badges: 4
-                },
-                {
-                    isOnline: false,
-                    username: 'rebecca76',
-                    coolPoints: 0,
-                    badges: 0
-                },
-                {
-                    isOnline: false,
-                    username: 'reggaerules',
-                    coolPoints: 5,
-                    badges: 1
-                }
-            ]);
-        }, 1);
-    })
+    return sendAuthenticatedRequest('/users');
 }
 
 export const getUserProfileInfo = (username) => {
@@ -186,66 +125,29 @@ export const getUserProfileInfo = (username) => {
 }
 
 export const openChatConnection = (username) => {
-    return sendAuthenticatedRequest('/chat/connect', { username });
+    return new Promise((resolve, reject) => {
+        sendAuthenticatedRequest('/chat/connect', { username }).then(
+            response => {
+                resolve(response.channelId);
+            },
+            _ => {
+                reject('There was a problem connecting to chat :(');
+            }
+        );
+    });
 }
 
 export const getMessages = (channelId) => {
     return sendAuthenticatedRequest('/chat/messages', { channelId });
 }
 
-export const sendMessage = (message) => {
-    return sendAuthenticatedRequest('/chat/message', { message })
+export const sendMessage = (channelId, message) => {
+    const hasResponse = false
+    return sendAuthenticatedRequest('/chat/message', { channelId, content: message }, hasResponse);
 }
 
 export const getMessageLists = () => {
-    return new Promise((resolve, reject) => {
-        setTimeout(() => {
-            resolve([
-                {
-                    'username': 'somepotato',
-                    'isOnline': true,
-                    'channelId': 'asdfds232131',
-                    'lastMessageDate': new Date('2019/07/16 13:22:27'),
-                    'lastMessagePreview': 'I really couldn\'t tell you but'
-                },
-                {
-                    'username': 'abcmeanderingaroundwithit',
-                    'isOnline': false,
-                    'channelId': 'asdfds232131',
-                    'lastMessageDate': new Date('2019/07/20 04:10:44'),
-                    'lastMessagePreview': 'wow i really didnt know that wa'
-                },
-                {
-                    'username': 'fairytalewonder',
-                    'isOnline': false,
-                    'channelId': 'asdfds232131',
-                    'lastMessageDate': new Date('2019/07/14 06:22:00'),
-                    'lastMessagePreview': 'now when you get going like tha'
-                },
-                {
-                    'username': 'halo_master_99',
-                    'isOnline': false,
-                    'channelId': 'asdfds232131',
-                    'lastMessageDate': new Date('2019/05/04 19:00:16'),
-                    'lastMessagePreview': 'lol me too!!'
-                },
-                {
-                    'username': 'rgso35',
-                    'isOnline': true,
-                    'channelId': 'asdfds232131',
-                    'lastMessageDate': new Date('2019/07/19 17:20:30'),
-                    'lastMessagePreview': 'well theres really not a whole'
-                },
-                {
-                    'username': 'justanotherreallylongusername',
-                    'isOnline': false,
-                    'channelId': 'asdfds232131',
-                    'lastMessageDate': new Date('2019/06/23 09:10:27'),
-                    'lastMessagePreview': 'thats what I was thinking!'
-                }
-            ]);
-        }, 1);
-    });
+    return sendAuthenticatedRequest('/messages/list');
 }
 
 export const doesUsernameExist = (username) => {

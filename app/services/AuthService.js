@@ -4,50 +4,49 @@ import { getApiUrl } from '../shared/Constants';
 // todo: refresh token periodically
 export const authenticate = () => {
     return new Promise((resolve, reject) => {
-        resolve(true);
-        // AsyncStorage.getItem('user-token', (err, token) => {
-        //     if (err) {
-        //         reject('Error reading values from device.');
-        //     }
-        //     else if (token) {
-        //         fetch(getApiUrl() + 'authenticate', {
-        //             method: 'POST',
-        //             headers: {
-        //                 'Content-Type': 'application/json'
-        //             },
-        //             body: JSON.stringify({ token })
-        //         }).then(
-        //             response => {
-        //                 if (response.ok) {
-        //                     response.json().then(responseBody => {
-        //                         AsyncStorage.setItem('user-token', responseBody.refreshedToken, (err) => {
-        //                             if (err) {
-        //                                 reject('Error using device storage.');
-        //                             }
-        //                             else {
-        //                                 setLastLogin().then(
-        //                                     () => { resolve(true); },
-        //                                     () => { reject('Error using device storage.') }
-        //                                 )
-        //                             }
-        //                         });
-        //                     });
-        //                 }
-        //                 else if (response.status === 400 || response.status === 401) {
-        //                     response.json().then(err => {
-        //                         resolve(false);
-        //                     });
-        //                 }
-        //                 else {
-        //                     reject('Error while authenticating.');
-        //                 }
-        //             }
-        //         );
-        //     }
-        //     else {
-        //         resolve(false);
-        //     }
-        // })
+        AsyncStorage.getItem('user-token', (err, token) => {
+            if (err) {
+                reject('Error reading values from device.');
+            }
+            else if (token) {
+                fetch(getApiUrl() + '/authenticate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ token })
+                }).then(
+                    response => {
+                        if (response.ok) {
+                            response.json().then(responseBody => {
+                                AsyncStorage.setItem('user-token', responseBody.refreshedToken, (err) => {
+                                    if (err) {
+                                        reject('Error using device storage.');
+                                    }
+                                    else {
+                                        setLastLogin().then(
+                                            () => { resolve(true); },
+                                            () => { reject('Error using device storage.') }
+                                        )
+                                    }
+                                });
+                            });
+                        }
+                        else if (response.status === 400 || response.status === 401) {
+                            response.json().then(err => {
+                                resolve(false);
+                            });
+                        }
+                        else {
+                            reject('Error while authenticating.');
+                        }
+                    }
+                );
+            }
+            else {
+                resolve(false);
+            }
+        })
     });
 }
 
@@ -62,18 +61,10 @@ export const saveAuthResponseData = (username, response, resolve, reject) => {
                     reject('Error saving to device storage.');
                 }
                 else {
-                    const numberOfChips = response.numberOfChips.toString();
-                    AsyncStorage.setItem('number-of-chips', numberOfChips, (err) => {
-                        if (err) {
-                            reject('Error saving to device storage.');
-                        }
-                        else {
-                            setLastLogin().then(
-                                () => { resolve({ isSuccess: true }); },
-                                () => { reject('Error using device storage.') }
-                            )
-                        }
-                    })
+                    setLastLogin().then(
+                        () => { resolve({ isSuccess: true }); },
+                        () => { reject('Error using device storage.') }
+                    );
                 }
             });
         }
@@ -82,7 +73,7 @@ export const saveAuthResponseData = (username, response, resolve, reject) => {
 
 export const createUser = (username, password, email) => {
     return new Promise((resolve, reject) => {
-        fetch(getApiUrl() + 'create-user', {
+        fetch(getApiUrl() + '/create-user', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -114,7 +105,7 @@ export const createUser = (username, password, email) => {
 
 export const logIn = (username, password) => {
     return new Promise((resolve, reject) => {
-        fetch(getApiUrl() + 'log-in', {
+        fetch(getApiUrl() + '/log-in', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

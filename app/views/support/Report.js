@@ -4,8 +4,9 @@ import { TouchableOpacity, TextInput } from 'react-native-gesture-handler';
 import { doesUsernameExist, getReportCategories, submitUserReport } from '../../services/ChatterUpService';
 import { ChatterUpLoadingSpinner } from '../partial/ChatterUpLoadingSpinner';
 import { Icon } from 'react-native-elements';
+import { AuthenticatedComponent } from '../../shared/AuthenticatedComponent';
 
-export class Report extends React.Component {
+export class Report extends AuthenticatedComponent {
     static navigationOptions = {
         title: 'report user'
     };

@@ -6,8 +6,9 @@ import { ChatterUpLoadingSpinner } from './partial/ChatterUpLoadingSpinner';
 import { getUserProfileInfo } from '../services/ChatterUpService';
 import { TouchableOpacity, TextInput, ScrollView, TouchableWithoutFeedback } from 'react-native-gesture-handler';
 import moment from 'moment';
+import { AuthenticatedComponent } from '../shared/AuthenticatedComponent';
 
-export class UserProfile extends React.Component {
+export class UserProfile extends AuthenticatedComponent {
     constructor(props) {
         super(props);
         

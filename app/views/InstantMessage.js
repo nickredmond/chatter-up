@@ -3,7 +3,9 @@ import { ChatterUpLoadingSpinner } from './partial/ChatterUpLoadingSpinner';
 import { Text, View, StyleSheet, ScrollView, KeyboardAvoidingView, TextInput, TouchableHighlight, Keyboard } from 'react-native';
 import KeyboardSpacer from 'react-native-keyboard-spacer';
 import AutogrowInput from 'react-native-autogrow-input';
+import Pusher from 'pusher-js/react-native';
 import { getUsername, getMessages, openChatConnection, sendMessage } from '../services/ChatterUpService';
+import { AuthenticatedComponent } from '../shared/AuthenticatedComponent';
 
 /**
  * These components were originally written by GitHub user @llamaluvr and were published at 
@@ -11,11 +13,10 @@ import { getUsername, getMessages, openChatConnection, sendMessage } from '../se
  */
 
 // The actual chat view itself- a ScrollView of BubbleMessages, with an InputBar at the bottom, which moves with the keyboard
-export class InstantMessage extends React.Component {
+export class InstantMessage extends AuthenticatedComponent {
   constructor(props) {
     super(props);
     this.state = {
-        otherUsername,
         messages: []
     };
 
@@ -29,23 +30,44 @@ export class InstantMessage extends React.Component {
     );
     
     const channelId = this.props.navigation.getParam('channelId');
-    const otherUsername = this.props.navigation.getParam('username');
+    
+    
     if (channelId) {
         this.state = { channelId, isLoading: true };
-        getExistingMessages(channelId);
+        this.getExistingMessages(channelId);
+        this.initializeMessageListener(channelId);
     }
     else {
         // todo: should this be loading too? maybe not cuz some users are fresh? 
+        const otherUsername = this.props.navigation.getParam('username');
         openChatConnection(otherUsername).then(
             channelId => {
                 this.setState({ channelId });
-                getExistingMessages(channelId);
+                this.getExistingMessages(channelId);
+                this.initializeMessageListener(channelId);
             },
             errorMessage => {
                 alert(errorMessage);
             }
         );
     }
+  }
+
+  initializeMessageListener = (channelId) => {
+    const socket = new Pusher('0eff4fdefc2715d879a4', { cluster: 'us3' });
+    const channel = socket.subscribe(channelId);
+    alert('hm1')
+    channel.bind('message', message => {
+        alert('hm2')
+        if (message.sentBy !== this.state.username) {
+            const uiMessage = {
+                direction: 'left',
+                dateSent: message.dateSent,
+                text: message.content
+            };
+            this.setState({ messages: this.state.messages.concat([uiMessage]) });
+        }
+    });
   }
 
   getExistingMessages = (channelId) => {
@@ -55,7 +77,7 @@ export class InstantMessage extends React.Component {
             const formattedMessages = [];
 
             for(var i = 0; i < messages.length; i++) {
-                const direction = messages[i].sentBy === this.state.otherUsername ? 'left' : 'right';
+                const direction = this.getMessageBubbleDirection(messages[i].sentBy);
 
                 formattedMessages.push({
                     direction,
@@ -73,6 +95,10 @@ export class InstantMessage extends React.Component {
             alert(errorMessage);
         }
     );
+  }
+
+  getMessageBubbleDirection(sentBy) {
+      return sentBy === this.state.username ? 'right' : 'left';
   }
 
   //fun keyboard stuff- we use these to get the end of the ScrollView to "follow" the top of the InputBar as the keyboard rises and falls
@@ -122,7 +148,7 @@ export class InstantMessage extends React.Component {
     };
     this.setState({ messages: this.state.messages.concat([uiMessage]) });
 
-    sendMessage(sanitizedText).then(
+    sendMessage(this.state.channelId, sanitizedText).then(
         _ => {},
         errorMessage => {
             alert(errorMessage);
@@ -182,7 +208,8 @@ export class InstantMessage extends React.Component {
 
 //The bubbles that appear on the left or the right for the messages.
 class MessageBubble extends React.Component {
-    getFormattedDateText = (dateTime) => {
+    getFormattedDateText = (dateTimeValue) => {
+        const dateTime = new Date(dateTimeValue);
         const date = dateTime.toLocaleDateString('en-US', { month: 'long' });
         const time = dateTime.toLocaleTimeString('en-US', { hour12: true });
         return date + ' ' + time;

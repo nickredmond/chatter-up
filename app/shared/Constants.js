@@ -1,3 +1,3 @@
 export const getApiUrl = () => {
-    return '';
+    return 'https://talk-it-out-api.herokuapp.com';
 }

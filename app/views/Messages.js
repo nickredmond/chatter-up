@@ -5,8 +5,9 @@ import { ChatterUpLoadingSpinner } from './partial/ChatterUpLoadingSpinner';
 import { OnlineStatusDot } from './partial/OnlineStatusDot';
 import { getMessageLists } from '../services/ChatterUpService';
 import moment from 'moment';
+import { AuthenticatedComponent } from '../shared/AuthenticatedComponent';
 
-export class Messages extends React.Component {
+export class Messages extends AuthenticatedComponent {
     static navigationOptions = {
         title: 'messages'
     };
@@ -29,8 +30,8 @@ export class Messages extends React.Component {
         )
     }
 
-    messagePreviewPressed = (username) => {
-        this.props.navigation.navigate('InstantMessage', { username });
+    messagePreviewPressed = (username, channelId) => {
+        this.props.navigation.navigate('InstantMessage', { username, channelId });
     }
 
     renderList = ({ item: messagePreview }) => {
@@ -47,7 +48,7 @@ export class Messages extends React.Component {
         return (
             <TouchableOpacity 
                 style={styles.messagePreviewBubble} 
-                onPress={() => this.messagePreviewPressed(messagePreview.username)}
+                onPress={() => this.messagePreviewPressed(messagePreview.username, messagePreview.channelId)}
                 >
                 <View style={styles.messagePreviewHeader}>
                     <OnlineStatusDot 

@@ -28,7 +28,7 @@ export class AuthenticatedComponent extends React.Component {
                                     }
                                 },
                                 () => {
-                                    alert('There was a problem authenticating your account.');
+                                    navigate('Login');
                                 }
                             )
                         }

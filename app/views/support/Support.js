@@ -2,8 +2,9 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { Icon } from 'react-native-elements';
+import { AuthenticatedComponent } from '../../shared/AuthenticatedComponent';
 
-export class Support extends React.Component {
+export class Support extends AuthenticatedComponent {
     static navigationOptions = {
         title: 'support'
     };

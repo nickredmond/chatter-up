@@ -4,8 +4,9 @@ import { Icon } from 'react-native-elements';
 import { ChatterUpLoadingSpinner } from './partial/ChatterUpLoadingSpinner';
 import { getUsers } from '../services/ChatterUpService';
 import { OnlineStatusDot } from './partial/OnlineStatusDot';
+import { AuthenticatedComponent } from '../shared/AuthenticatedComponent';
 
-export class Chat extends React.Component {
+export class Chat extends AuthenticatedComponent {
     static navigationOptions = {
         title: 'chat'
     };
