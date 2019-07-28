@@ -165,8 +165,10 @@ export const getReportCategories = () => {
         resolve([
             'belittling',
             'shaming',
+            'soliciting',
             'doxxing',
             'trolling',
+            'unwelcome advances',
             'other'
         ]);
     })
@@ -178,4 +180,17 @@ export const submitUserReport = (userReport) => {
             resolve();
         }, 2000);
     })
+}
+
+export const initializeCall = (username) => {
+    return new Promise((resolve, reject) => {
+        sendAuthenticatedRequest('/call/initialize', { username }).then(
+            response => {
+                resolve(response.virtualNumber);
+            },
+            _ => {
+                reject('There was a problem connecting the call :(');
+            }
+        );
+    });
 }

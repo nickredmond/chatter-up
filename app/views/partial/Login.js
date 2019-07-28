@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, TouchableOpacity, TextInput, StyleSheet } from 'react-native';
 import { ChatterUpText } from '../partial/ChatterUpText';
 import { logIn, createUser } from '../../services/AuthService';
+import { ChatterUpLoadingSpinner } from './ChatterUpLoadingSpinner';
 
 var  EMAIL_PATTERN = /^\S+@\S+$/;
 export class Login extends React.Component {
@@ -12,7 +13,8 @@ export class Login extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            isNewUser: false
+            isNewUser: false,
+            isProcessingAction: false
         };
     }
 
@@ -33,12 +35,18 @@ export class Login extends React.Component {
     clearPageError = () => {
         this.setState({ pageError: null });
     }
+    setProcessingAction = (isProcessingAction) => {
+        this.setState({ isProcessingAction });
+    }
 
     doSignUp = () => {
         this.clearPageError();
         if (this.isFormValid()) {
+            this.setProcessingAction(true);
             createUser(this.state.username, this.state.password, this.state.email).then(
                 (response) => {
+                    this.setProcessingAction(false);
+                    
                     if (response.isSuccess) {
                         this.props.loggedIn();
                     }
@@ -53,18 +61,21 @@ export class Login extends React.Component {
                     }
                 },
                 () => {
+                    this.setProcessingAction(false);
                     this.setPageError('There was a problem creating new user.');
                 }
             );
         }
     }
 
-    // todo: spinner on login/signup until response is returned
     doLogIn = () => {
         this.clearPageError();
         if (this.isFormValid()) {
+            this.setProcessingAction(true);
             logIn(this.state.username, this.state.password).then(
                 (response) => {
+                    this.setProcessingAction(false);
+                    
                     if (response.isSuccess) {
                         this.props.loggedIn();
                     }
@@ -76,6 +87,7 @@ export class Login extends React.Component {
                     }
                 },
                 () => {
+                    this.setProcessingAction(false);
                     this.setPageError('There was a problem logging in.');
                 }
             );
@@ -245,9 +257,16 @@ export class Login extends React.Component {
                 {
                     this.state.isNewUser && 
                     <View>
-                        <TouchableOpacity style={styles.button} onPress={() => this.doSignUp()}>
-                            <Text style={styles.buttonText}>sign up</Text>
-                        </TouchableOpacity>
+                        {
+                            !this.state.isProcessingAction && 
+                            <TouchableOpacity style={styles.button} onPress={() => this.doSignUp()}>
+                                <Text style={styles.buttonText}>sign up</Text>
+                            </TouchableOpacity>
+                        }
+                        {
+                            this.state.isProcessingAction && 
+                            <ChatterUpLoadingSpinner></ChatterUpLoadingSpinner>
+                        }
                         <View style={styles.formFooter}>
                             <ChatterUpText style={styles.footerText} textValue={'Already have an account?'}></ChatterUpText>
                             <TouchableOpacity onPress={() => this.setNewUser(false)}>
@@ -259,9 +278,16 @@ export class Login extends React.Component {
                 {
                     !this.state.isNewUser && 
                     <View>
-                        <TouchableOpacity style={styles.button} onPress={() => this.doLogIn()}>
-                            <Text style={styles.buttonText}>log in</Text>
-                        </TouchableOpacity>
+                        {
+                            !this.state.isProcessingAction && 
+                            <TouchableOpacity style={styles.button} onPress={() => this.doLogIn()}>
+                                <Text style={styles.buttonText}>log in</Text>
+                            </TouchableOpacity>
+                        }
+                        {
+                            this.state.isProcessingAction && 
+                            <ChatterUpLoadingSpinner></ChatterUpLoadingSpinner>
+                        }
                         <View style={styles.formFooter}>
                             <ChatterUpText style={styles.footerText} textValue={'New kid on the block?'}></ChatterUpText>
                             <TouchableOpacity onPress={() => this.setNewUser(true)}>

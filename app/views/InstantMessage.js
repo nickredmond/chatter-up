@@ -56,9 +56,8 @@ export class InstantMessage extends AuthenticatedComponent {
   initializeMessageListener = (channelId) => {
     const socket = new Pusher('0eff4fdefc2715d879a4', { cluster: 'us3' });
     const channel = socket.subscribe(channelId);
-    alert('hm1 ' + channelId)
+    
     channel.bind('message', message => {
-        alert('hm2')
         if (message.sentBy !== this.state.username) {
             const uiMessage = {
                 direction: 'left',

@@ -1,7 +1,8 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
+import { AuthenticatedComponent } from '../shared/AuthenticatedComponent';
 
-export class BlankComponent extends React.Component {
+export class BlankComponent extends AuthenticatedComponent {
     constructor(props) {
         super(props);
     }
@@ -18,6 +19,7 @@ export class BlankComponent extends React.Component {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        backgroundColor: '#222',
         alignItems: 'center'
     }
 });

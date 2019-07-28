@@ -44,17 +44,15 @@ export class UserProfile extends AuthenticatedComponent {
         return 'last online ' + moment(this.state.userInfo.lastOnline).fromNow();
     }
 
-    phoneButtonPressed = () => {
-        // todo: 
-        // 0. navigate to phone call page
-        // 1. try to connect phone call
-        // 2. if user is already in-call (prop?) then show corresponding message
-        // 3. show in-call UI with username, phone icon, time in call, etc
-    }
-
-    chatButtonPressed = () => {
+    navigateToUser = (viewName) => {
         const username = this.state.userInfo.username;
-        this.props.navigation.navigate('InstantMessage', { username });
+        this.props.navigation.navigate(viewName, { username });
+    }
+    phoneButtonPressed = () => {
+        this.navigateToUser('PhoneCall');
+    }
+    chatButtonPressed = () => {
+        this.navigateToUser('InstantMessage');
     }
 
     badgePressed = (badge) => {
