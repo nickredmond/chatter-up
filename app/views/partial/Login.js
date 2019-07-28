@@ -48,7 +48,7 @@ export class Login extends React.Component {
                     this.setProcessingAction(false);
                     
                     if (response.isSuccess) {
-                        this.props.loggedIn();
+                        this.props.createdUser();
                     }
                     else if (response.playerAlreadyExists) {
                         this.setPageError('Username is already taken.');
@@ -77,7 +77,7 @@ export class Login extends React.Component {
                     this.setProcessingAction(false);
                     
                     if (response.isSuccess) {
-                        this.props.loggedIn();
+                        this.props.loggedIn(response);
                     }
                     else if (response.playerExists) {
                         this.setPageError('Password is incorrect.');

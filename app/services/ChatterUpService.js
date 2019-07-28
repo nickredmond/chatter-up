@@ -1,6 +1,6 @@
 import { AsyncStorage } from 'react-native';
 import { getApiUrl } from '../shared/Constants';
-import { getUserToken } from './AuthService';
+import { getUserToken, authenticate } from './AuthService';
 
 export const sendAuthenticatedRequest = (path, body, hasResponse) => {
     return new Promise((resolve, reject) => {
@@ -194,3 +194,59 @@ export const initializeCall = (username) => {
         );
     });
 }
+
+/** SETUP FUNCTIONS */
+
+const userErrorPossibleRequest = (path, body, userErrorResponse) => {
+    return new Promise((resolve, reject) => {
+        getUserToken().then(
+            token => {
+                const requestBody = body;
+                requestBody.token = token; 
+                fetch(getApiUrl() + path, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(requestBody)
+                }).then(
+                    response => {
+                        if (response.ok) {
+                            resolve(true);
+                        }
+                        else if (response.status === 400) {
+                            reject(userErrorResponse);
+                        }
+                        else {
+                            reject('There was a problem with the request.');
+                        }
+                    },
+                    _ => {
+                        reject('There was a problem communicating with server.');
+                    }
+                )
+            },
+            _ => {
+                reject('There was a problem reading from device storage.');
+            }
+        );
+    });
+}
+
+export const submitPhoneNumber = (phoneNumber) => {
+    const errorResponse = { isNumberTaken: true };
+    return userErrorPossibleRequest('/user/phone', { phoneNumber }, errorResponse);
+}
+
+export const submitConfirmationCode = (confirmationCode) => {
+    const body = { verificationNumber: confirmationCode };
+    const errorResponse = { invalidCode: true };
+    return userErrorPossibleRequest('/user/phone/verify', body, errorResponse);
+}
+
+export const submitAboutMe = (aboutMe) => {
+    const hasResponse = false;
+    return sendAuthenticatedRequest('/profile/about', { aboutMe }, hasResponse);
+}
+
+/** END: SETUP FUNCTIONS */

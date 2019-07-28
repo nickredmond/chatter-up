@@ -25,11 +25,22 @@ export class Home extends React.Component {
         });
     }
 
-    loggedIn = () => {
-        this.setState({ isAuthenticated: true });
+    loggedIn = (response) => {
+        if (!(response.phoneNumberExists && response.phoneNumberVerified)) {
+            this.props.navigation.navigate('PhoneNumberConfirmation', {
+                phoneNumberExists: response.phoneNumberExists
+            });
+        }
+        else {
+            this.setState({ isAuthenticated: true });
+        }
     }
     loggedOut = () => {
         this.setState({ isAuthenticated: false });
+    }
+
+    createdUser = () => {
+        this.props.navigation.navigate('AboutMe');
     }
 
     goTo = (viewName, navigationParams) => {
@@ -65,7 +76,10 @@ export class Home extends React.Component {
 
                     {
                         !(this.state.isLoading || this.state.isAuthenticated) && 
-                        <Login loggedIn={this.loggedIn}></Login>
+                        <Login 
+                            createdUser={this.createdUser}
+                            loggedIn={(response) => this.loggedIn(response)}>
+                        </Login>
                     }
                 </View>
             </View>

@@ -62,7 +62,13 @@ export const saveAuthResponseData = (username, response, resolve, reject) => {
                 }
                 else {
                     setLastLogin().then(
-                        () => { resolve({ isSuccess: true }); },
+                        () => { 
+                            resolve({ 
+                                isSuccess: true,
+                                phoneNumberExists: response.phoneNumberExists,
+                                phoneNumberVerified: response.phoneNumberVerified
+                            }); 
+                        },
                         () => { reject('Error using device storage.') }
                     );
                 }

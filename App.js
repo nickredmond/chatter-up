@@ -7,6 +7,8 @@ import { InstantMessage } from './app/views/InstantMessage';
 import { Support } from './app/views/support/Support';
 import { Report } from './app/views/support/Report';
 import { ReportConfirmed } from './app/views/support/ReportConfirmed';
+import { AboutMe } from './app/views/setup/AboutMe';
+import { PhoneNumberConfirmation } from './app/views/setup/PhoneNumberConfirmation';
 
 const getTrimmedUsernameTitle = (username) => {
   return username.length > 16 ? username.substring(0, 15) + '...' : username;
@@ -21,6 +23,9 @@ const AppRoutes = createStackNavigator(
     Home,
     Chat,
     Messages,
+
+    AboutMe,
+    PhoneNumberConfirmation,
 
     Support,
     Report,
