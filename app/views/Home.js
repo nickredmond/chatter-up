@@ -17,29 +17,35 @@ export class Home extends React.Component {
             isAuthenticated: false
         };
 
-        authenticate().then(isValid => {
+        authenticate().then(response => {
             this.setState({
-                isAuthenticated: isValid,
+                isAuthenticated: response.isValid,
                 isLoading: false
             });
+
+            if (response.isValid && !response.isPhoneNumberConfirmed) {
+                const phoneNumberExists = response.phoneNumberExists;
+                this.props.navigation.navigate('PhoneNumberConfirmation', { phoneNumberExists });
+            }
         });
     }
 
     loggedIn = (response) => {
+        this.setState({ isAuthenticated: true });
+
         if (!(response.phoneNumberExists && response.phoneNumberVerified)) {
             this.props.navigation.navigate('PhoneNumberConfirmation', {
                 phoneNumberExists: response.phoneNumberExists
             });
         }
-        else {
-            this.setState({ isAuthenticated: true });
-        }
     }
+    
     loggedOut = () => {
         this.setState({ isAuthenticated: false });
     }
 
     createdUser = () => {
+        this.setState({ isAuthenticated: true });
         this.props.navigation.navigate('AboutMe');
     }
 

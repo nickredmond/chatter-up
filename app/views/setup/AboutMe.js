@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet, Text, TextInput } from 'react-native';
+import { View, StyleSheet, Text, TextInput, BackHandler } from 'react-native';
 import { Icon } from 'react-native-elements';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { AuthenticatedComponent } from '../../shared/AuthenticatedComponent';
@@ -7,7 +7,8 @@ import { submitAboutMe } from '../../services/ChatterUpService';
 
 export class AboutMe extends AuthenticatedComponent {
     static navigationOptions = {
-        title: 'about me'
+        title: 'about me',
+        headerLeft: null
     };
 
     constructor(props) {
@@ -15,6 +16,18 @@ export class AboutMe extends AuthenticatedComponent {
         this.state = {
             aboutMe: ''
         };
+    }
+
+    componentDidMount() {
+        BackHandler.addEventListener('hardwareBackPress', this.handleBackButton);
+    }
+
+    componentWillUnmount() {
+        BackHandler.removeEventListener('hardwareBackPress', this.handleBackButton);
+    }
+
+    handleBackButton = () => {
+        return true;
     }
 
     aboutMeCancelPressed = () => {
@@ -28,7 +41,6 @@ export class AboutMe extends AuthenticatedComponent {
         if (!isBlank) {
             submitAboutMe(this.state.aboutMe).then(
                 _ => {
-                    alert('hm')
                     this.props.navigation.navigate('PhoneNumberConfirmation');
                 },
                 _ => {

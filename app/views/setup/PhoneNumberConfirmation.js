@@ -1,11 +1,16 @@
 import React from 'react';
-import { View, StyleSheet, Text, TextInput } from 'react-native';
+import { View, StyleSheet, Text, TextInput, BackHandler } from 'react-native';
 import { AuthenticatedComponent } from '../../shared/AuthenticatedComponent';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { submitPhoneNumber, submitConfirmationCode } from '../../services/ChatterUpService';
 import { ChatterUpLoadingSpinner } from '../partial/ChatterUpLoadingSpinner';
 
 export class PhoneNumberConfirmation extends AuthenticatedComponent {
+    static navigationOptions = {
+        title: 'confirm phone number',
+        headerLeft: null
+    };
+
     constructor(props) {
         super(props);
 
@@ -18,36 +23,67 @@ export class PhoneNumberConfirmation extends AuthenticatedComponent {
         };
     }
 
+    componentDidMount() {
+        BackHandler.addEventListener('hardwareBackPress', this.handleBackButton);
+    }
+
+    componentWillUnmount() {
+        BackHandler.removeEventListener('hardwareBackPress', this.handleBackButton);
+    }
+
+    handleBackButton = () => {
+        return true;
+    }
+
+    getPhoneNumberSubtext = () => {
+        return 'We will never share your number with anyone else, and your number will be ' +
+            'hidden from other TalkItOut users. We only use it to connect your private calls ' + 
+            'and to minimize "bot" users.';
+    }
+
     phoneNumberChanged = (text) => {
-        this.setState({ phoneNumber: text });
+        this.setState({ 
+            phoneNumber: text,
+            isNumberTaken: false,
+            invalidNumber: false
+        });
     }
 
     phoneNumberSubmitted = () => {
         if (this.state.phoneNumber) {
-            this.setState({
-                isNumberTaken: false,
-                loading: true
-            });
-            submitPhoneNumber(this.state.phoneNumber).then(
-                _ => {
-                    this.setState({
-                        loading: false,
-                        enteringNumber: false,
-                        confirmingNumber: true
-                    });
-                },
-                error => {
-                    if (error.isNumberTaken) {
-                        this.setState({ 
+            let formattedNumber = this.state.phoneNumber.replace(/\D/g, '');
+            if (formattedNumber.length === 10) {
+                formattedNumber = '1' + formattedNumber;
+                this.setState({
+                    isNumberTaken: false,
+                    loading: true
+                });
+                submitPhoneNumber(formattedNumber).then(
+                    _ => {
+                        this.setState({
                             loading: false,
-                            isNumberTaken: true 
+                            enteringNumber: false,
+                            confirmingNumber: true
                         });
+                    },
+                    error => {
+                        if (error.isNumberTaken) {
+                            this.setState({ 
+                                loading: false,
+                                isNumberTaken: true 
+                            });
+                        }
+                        else {
+                            alert(error);
+                        }
                     }
-                    else {
-                        alert(error);
-                    }
-                }
-            )
+                );
+            }
+            else {
+                this.setState({
+                    invalidNumber: true
+                });
+            }
         }
     }
 
@@ -82,7 +118,7 @@ export class PhoneNumberConfirmation extends AuthenticatedComponent {
     }
 
     goHome = () => {
-        this.props.navigation.navigate('Home');
+        this.props.navigation.navigate('Home', { isAuthenticated: true });
     }
 
     render() {
@@ -92,9 +128,11 @@ export class PhoneNumberConfirmation extends AuthenticatedComponent {
                     this.state.enteringNumber && 
                     <View style={styles.subContainer}>
                         <Text style={styles.title}>{'enter your phone #'}</Text>
+                        <Text style={styles.subtext}>{this.getPhoneNumberSubtext()}</Text>
                         <TextInput 
                             style={styles.input} 
                             value={this.state.phoneNumber} 
+                            placeholder={'ex: 123-456-7890'}
                             onChangeText={(text) => this.phoneNumberChanged(text)}>
                         </TextInput>
                         {
@@ -111,6 +149,10 @@ export class PhoneNumberConfirmation extends AuthenticatedComponent {
                             this.state.isNumberTaken && 
                             <Text style={styles.errorMessage}>{'That number is already in use.'}</Text>
                         }
+                        {
+                            this.state.invalidNumber && 
+                            <Text style={styles.errorMessage}>{'Please enter number in 10-digit format, including area code.'}</Text>
+                        }
                     </View>
                 }
                 
@@ -118,9 +160,11 @@ export class PhoneNumberConfirmation extends AuthenticatedComponent {
                     this.state.confirmingNumber && 
                     <View style={styles.subContainer}>
                         <Text style={styles.title}>{'enter confirmation code'}</Text>
+                        <Text style={styles.subtext}>{'A confirmation code has been sent to your phone via SMS/text.'}</Text>
                         <TextInput 
                             style={styles.input} 
                             value={this.state.confirmationCode} 
+                            placeholder={'confirmation code'}
                             onChangeText={(text) => this.confirmationCodeChanged(text)}>
                         </TextInput>
                         {
@@ -166,8 +210,15 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 36,
         color: '#efefef',
-        marginBottom: 15
+        marginBottom: 10
     },
+    subtext: {
+        color: '#dedede',
+        fontSize: 16,
+        marginBottom: 15,
+        marginLeft: 10,
+        marginRight: 10
+    }, 
     input: {
         alignSelf: 'stretch',
         marginLeft: 10,

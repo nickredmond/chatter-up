@@ -25,7 +25,13 @@ export const authenticate = () => {
                                     }
                                     else {
                                         setLastLogin().then(
-                                            () => { resolve(true); },
+                                            () => { 
+                                                resolve({
+                                                    isValid: true,
+                                                    isPhoneNumberConfirmed: responseBody.isPhoneNumberConfirmed || false,
+                                                    phoneNumberExists: responseBody.phoneNumberExists || false
+                                                }); 
+                                            },
                                             () => { reject('Error using device storage.') }
                                         )
                                     }
@@ -33,9 +39,7 @@ export const authenticate = () => {
                             });
                         }
                         else if (response.status === 400 || response.status === 401) {
-                            response.json().then(err => {
-                                resolve(false);
-                            });
+                            resolve({ isValid: false });
                         }
                         else {
                             reject('Error while authenticating.');
@@ -44,7 +48,7 @@ export const authenticate = () => {
                 );
             }
             else {
-                resolve(false);
+                resolve({ isValid: false });
             }
         })
     });
