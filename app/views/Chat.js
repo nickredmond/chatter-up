@@ -55,7 +55,13 @@ export class Chat extends AuthenticatedComponent {
         return (
             <TouchableOpacity style={styles.userItem} onPress={() => this.userSelected(user.username)}>
                 <OnlineStatusDot isOnline={user.isOnline}></OnlineStatusDot>
-                
+                {
+                    user.canBeCalled && 
+                    <View style={styles.phoneIconContainer}>
+                        <Icon size={24} name='phone' type='font-awesome' color='green' />
+                    </View>
+                }
+
                 <Text style={styles.userItemText}>{ truncatedName }</Text>
                 <View style={styles.statContainer}>
                     <Icon size={24} name='thumbs-up' type='font-awesome' color='#222' />
@@ -102,7 +108,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         backgroundColor: '#88aaff',
         paddingLeft: 10,
-        paddingRight: 10,
+        paddingRight: 5,
         paddingTop: 15,
         paddingBottom: 15,
         margin: 5
@@ -120,5 +126,8 @@ const styles = StyleSheet.create({
     statText: {
         fontSize: 20,
         marginLeft: 5
+    },
+    phoneIconContainer: {
+        marginLeft: 10
     }
 });

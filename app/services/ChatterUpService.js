@@ -72,56 +72,7 @@ export const getUsers = () => {
 }
 
 export const getUserProfileInfo = (username) => {
-    return new Promise((resolve, reject) => {
-        setTimeout(() => {
-            resolve({
-                username,
-                isOnline: false,
-                lastOnline: new Date(2019, 5, 29), // Date, else null if online
-                coolPoints: 1097,
-                badges: [
-                    {
-                        icon: 'hearing',
-                        name: 'Good Listener',
-                        description: 'Makes an effort to listen attentively without interrupting.'
-                    },
-                    {
-                        icon: 'grade',
-                        name: 'A-Player',
-                        description: 'Has taken at least 50 calls, and has spent ample time with many calls.'
-                    },
-                    {
-                        icon: 'terrain',
-                        name: 'Rock the World',
-                        description: 'Has been users\' "rock" by remaining calm and objective while helping people work through difficult situations.'
-                    },
-                    {
-                        icon: 'sentiment-satisfied',
-                        name: 'Friend in Me',
-                        description: 'Is very friendly and helps bring cheer or solace to others.'
-                    },
-                    {
-                        icon: 'directions',
-                        name: 'Wise One',
-                        description: 'Known for providing guidance and direction that has helped others move past difficult times.'
-                    },
-                    {
-                        icon: 'favorite',
-                        name: 'Superstar',
-                        description: 'Has been regarded by at least 100 different users, and is a shining example of what keeps the world moving \'round.'
-                    },
-                    {
-                        icon: 'watch',
-                        name: 'The Great Protector',
-                        description: 'Has reported numerous individuals who were determined to be unwelcome on the platform. In other words, keeps us safe from trolls.'
-                    }
-                ],
-                about: 'I just love trolling people and making them feel bad about themselves... jk. ' + 
-                    'I\'ve been told I\'m a pretty cool dude, and I like talking with people because sometimes people ' + 
-                    'have interesting things to say. Other times, not so much.'
-            })
-        }, 1);
-    })
+    return sendAuthenticatedRequest('/user', { username });
 }
 
 export const openChatConnection = (username) => {

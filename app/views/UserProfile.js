@@ -157,8 +157,8 @@ export class UserProfile extends AuthenticatedComponent {
                             <View style={styles.buttonsContainer}>
                                 <View style={styles.buttonWrapper}>
                                     <TouchableOpacity 
-                                        style={this.getPhoneButtonStyles(this.state.userInfo.isOnline)}
-                                        disabled={!this.state.userInfo.isOnline} 
+                                        style={this.getPhoneButtonStyles(this.state.userInfo.canBeCalled)}
+                                        disabled={!this.state.userInfo.canBeCalled} 
                                         onPress={() => this.phoneButtonPressed()}
                                         >
                                         <Icon size={48} name='phone' type='font-awesome' color='#efefef' />
@@ -294,8 +294,9 @@ const styles = StyleSheet.create({
     buttonsContainer: {
         flex: 1,
         flexDirection: 'row',
-        alignItems: 'center',
+        justifyContent: 'center',
         alignSelf: 'stretch',
+        width: '90%',
         marginLeft: 10,
         marginRight: 10
     },

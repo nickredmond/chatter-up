@@ -4,6 +4,7 @@ import { Chat } from './app/views/Chat';
 import { Messages } from './app/views/Messages';
 import { UserProfile } from './app/views/UserProfile';
 import { InstantMessage } from './app/views/InstantMessage';
+import { PhoneCall } from './app/views/PhoneCall';
 import { Support } from './app/views/support/Support';
 import { Report } from './app/views/support/Report';
 import { ReportConfirmed } from './app/views/support/ReportConfirmed';
@@ -41,6 +42,12 @@ const AppRoutes = createStackNavigator(
       screen: InstantMessage,
       navigationOptions: ({ navigation }) => ({
         title: getTrimmedUsernameTitle(navigation.state.params.username)
+      })
+    },
+    PhoneCall: {
+      screen: PhoneCall,
+      navigationOptions: ({ navigation }) => ({
+        title: 'in-call: ' + getTrimmedUsernameTitle(navigation.state.params.username)
       })
     }
   },
