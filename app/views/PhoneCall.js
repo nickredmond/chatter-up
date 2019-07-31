@@ -3,6 +3,7 @@ import { View, StyleSheet, Text, Linking } from 'react-native';
 import { AuthenticatedComponent } from '../shared/AuthenticatedComponent';
 import { ChatterUpLoadingSpinner } from './partial/ChatterUpLoadingSpinner';
 import { initializeCall } from '../services/ChatterUpService';
+import { getFormattedPhoneNumber } from '../shared/Constants';
 
 const NOTIFY_USER_TIMEOUT = 3000;
 const LoadingStates = {
@@ -75,7 +76,7 @@ export class PhoneCall extends AuthenticatedComponent {
     }
 
     getDialingSubtext = () => {
-        const formattedNumber = this.state.virtualNumber.substring(1).replace(/(\d{3})(\d{3})(\d{4})/, '$1-$2-$3');
+        const formattedNumber = getFormattedPhoneNumber(this.state.virtualNumber);
         return 'You may be prompted to dial the number "' + formattedNumber + '", ' +
             'which will connect you to user "' + this.state.otherUsername + '".';
     }
@@ -95,6 +96,7 @@ export class PhoneCall extends AuthenticatedComponent {
                     </View>
                 }
                 {/* TODO: maybe add 'home' button or something, like in report-submitted? */}
+                {/* TODO: also, add button to open telephone prompt again in case they exit accidentally */}
             </View>
         );
     }

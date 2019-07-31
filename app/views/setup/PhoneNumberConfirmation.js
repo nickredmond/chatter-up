@@ -41,6 +41,20 @@ export class PhoneNumberConfirmation extends AuthenticatedComponent {
             'and to minimize "bot" users.';
     }
 
+    getConfirmText = (index) => {
+        const confirmTexts = [
+            'Please feel free to start connecting with other users right away. TalkItOut is meant ' + 
+                'to be a platform where users can freely express themselves anonymously in a welcoming ' + 
+                'environment, so if you believe another user is acting unfriendly in harmful ways then don\'t ' +
+                'hesitate to block or report the user through the "support" menu.',
+            'If you have any questions then refer to the "faq" section of the "support" menu, or contact TalkItOut ' + 
+                'directly via the "contact" form if you don\'t see your question in the faq.',
+            'If you want users to possibly reach out to you via phone then enable incoming phone calls via "profile".',
+            'Welcome to TalkItOut, and have fun!'
+        ];
+        return confirmTexts[index];
+    }
+
     phoneNumberChanged = (text) => {
         this.setState({ 
             phoneNumber: text,
@@ -188,6 +202,14 @@ export class PhoneNumberConfirmation extends AuthenticatedComponent {
                     this.state.numberConfirmed && 
                     <View style={styles.subContainer}>
                         <Text style={styles.title}>you're all set!</Text>
+                        <Text style={styles.confirmText}>{this.getConfirmText(0)}</Text>
+                        <View style={styles.confirmTextSpacer}></View>
+                        <Text style={styles.confirmText}>{this.getConfirmText(1)}</Text>
+                        <View style={styles.confirmTextSpacer}></View>
+                        <Text style={styles.confirmText}>{this.getConfirmText(2)}</Text>
+                        <View style={styles.confirmTextSpacer}></View>
+                        <Text style={styles.confirmText}>{this.getConfirmText(3)}</Text>
+                        <View style={styles.confirmTextSpacer}></View>
                         <TouchableOpacity style={[styles.button, styles.confirmButton]} onPress={this.goHome}>
                             <Text style={styles.confirmbuttonText}>home</Text>
                         </TouchableOpacity>
@@ -258,5 +280,14 @@ const styles = StyleSheet.create({
         color: '#efefef',
         fontWeight: 'bold',
         fontSize: 24
+    },
+    confirmText: {
+        color: '#dedede',
+        fontSize: 18,
+        marginLeft: 10,
+        marginRight: 10
+    }, 
+    confirmTextSpacer: {
+        minHeight: 15
     }
 });

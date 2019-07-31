@@ -3,6 +3,7 @@ import { View, Text, StyleSheet } from 'react-native';
 import { MainMenu } from './partial/MainMenu';
 import { Login } from './partial/Login';
 import { authenticate } from '../services/AuthService';
+import { IncomingCallOverlay } from '../shared/IncomingCallOverlay';
 
 export class Home extends React.Component {
     static navigationOptions = {
@@ -88,6 +89,11 @@ export class Home extends React.Component {
                         </Login>
                     }
                 </View>
+
+                {
+                    this.state.isAuthenticated && 
+                    <IncomingCallOverlay></IncomingCallOverlay>
+                }
             </View>
         );
     }

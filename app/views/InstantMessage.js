@@ -3,9 +3,9 @@ import { ChatterUpLoadingSpinner } from './partial/ChatterUpLoadingSpinner';
 import { Text, View, StyleSheet, ScrollView, KeyboardAvoidingView, TextInput, TouchableHighlight, Keyboard } from 'react-native';
 import KeyboardSpacer from 'react-native-keyboard-spacer';
 import AutogrowInput from 'react-native-autogrow-input';
-import Pusher from 'pusher-js/react-native';
 import { getUsername, getMessages, openChatConnection, sendMessage } from '../services/ChatterUpService';
 import { AuthenticatedComponent } from '../shared/AuthenticatedComponent';
+import { getPusherInstance } from '../shared/Constants';
 
 /**
  * These components were originally written by GitHub user @llamaluvr and were published at 
@@ -54,7 +54,7 @@ export class InstantMessage extends AuthenticatedComponent {
   }
 
   initializeMessageListener = (channelId) => {
-    const socket = new Pusher('0eff4fdefc2715d879a4', { cluster: 'us3' });
+    const socket = getPusherInstance();
     const channel = socket.subscribe(channelId);
     
     channel.bind('message', message => {

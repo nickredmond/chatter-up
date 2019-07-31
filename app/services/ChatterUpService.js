@@ -57,14 +57,7 @@ export const getUsername = () => {
 }
 
 export const getRandomQuote = () => {
-    return new Promise((resolve, reject) => {
-        setTimeout(() => {
-            resolve({
-                text: 'I get up every morning and it\'s going to be a great day. You never know when it\'s going to be over, so I refuse to have a bad day.',
-                author: 'Paul Henderson'
-            })
-        }, 1000);
-    })
+    return sendAuthenticatedRequest('/quote');
 }
 
 export const getUsers = () => {
@@ -201,3 +194,9 @@ export const submitAboutMe = (aboutMe) => {
 }
 
 /** END: SETUP FUNCTIONS */
+
+export const setPhoneCallsEnabled = (enabled) => {
+    const hasResponse = false;
+    const actionPath = enabled ? 'enable' : 'disable';
+    return sendAuthenticatedRequest('/profile/calls/' + actionPath, null, hasResponse);
+}

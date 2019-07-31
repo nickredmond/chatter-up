@@ -65,16 +65,23 @@ export const saveAuthResponseData = (username, response, resolve, reject) => {
                     reject('Error saving to device storage.');
                 }
                 else {
-                    setLastLogin().then(
-                        () => { 
-                            resolve({ 
-                                isSuccess: true,
-                                phoneNumberExists: response.phoneNumberExists,
-                                phoneNumberVerified: response.phoneNumberVerified
-                            }); 
-                        },
-                        () => { reject('Error using device storage.') }
-                    );
+                    AsyncStorage.setItem('socket-receive-id', response.socketReceiveId, (err) => {
+                        if (err) {
+                            reject('Error saving to device storage.');
+                        }
+                        else {
+                            setLastLogin().then(
+                                () => { 
+                                    resolve({ 
+                                        isSuccess: true,
+                                        phoneNumberExists: response.phoneNumberExists,
+                                        phoneNumberVerified: response.phoneNumberVerified
+                                    }); 
+                                },
+                                () => { reject('Error using device storage.') }
+                            );
+                        }
+                    });
                 }
             });
         }
@@ -205,6 +212,19 @@ export const getCurrentUsername = () => {
             }
             else {
                 resolve(username);
+            }
+        })
+    });
+}
+
+export const getSocketReceiveId = () => {
+    return new Promise((resolve, reject) => {
+        AsyncStorage.getItem('socket-receive-id', (err, socketReceiveId) => {
+            if (err) {
+                reject('Error reading values from device.');
+            }
+            else {
+                resolve(socketReceiveId);
             }
         })
     });

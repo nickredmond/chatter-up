@@ -3,10 +3,11 @@ import { View, StyleSheet, FlatList, Text, KeyboardAvoidingView } from 'react-na
 import { Icon } from 'react-native-elements';
 import { ChatterUpText } from './partial/ChatterUpText';
 import { ChatterUpLoadingSpinner } from './partial/ChatterUpLoadingSpinner';
-import { getUserProfileInfo } from '../services/ChatterUpService';
-import { TouchableOpacity, TextInput, ScrollView, TouchableWithoutFeedback } from 'react-native-gesture-handler';
+import { getUserProfileInfo, setPhoneCallsEnabled, submitAboutMe } from '../services/ChatterUpService';
+import { TouchableOpacity, TextInput, ScrollView, TouchableWithoutFeedback, Switch } from 'react-native-gesture-handler';
 import moment from 'moment';
 import { AuthenticatedComponent } from '../shared/AuthenticatedComponent';
+import { getCurrentUsername } from '../services/AuthService';
 
 export class UserProfile extends AuthenticatedComponent {
     constructor(props) {
@@ -18,7 +19,23 @@ export class UserProfile extends AuthenticatedComponent {
             isEditable
         };
 
-        const username = this.props.navigation.getParam('username');
+        let username = this.props.navigation.getParam('username', false);
+        if (username) {
+            this.getProfileInfo(username);
+        }
+        else {
+            getCurrentUsername().then(
+                currentUsername => {
+                    this.getProfileInfo(currentUsername);
+                },
+                errorMessage => {
+                    alert(errorMessage);
+                }
+            );
+        }
+    }
+
+    getProfileInfo = (username) => {
         getUserProfileInfo(username).then(
             userInfo => {
                 this.setState({ userInfo, isLoading: false });
@@ -76,6 +93,9 @@ export class UserProfile extends AuthenticatedComponent {
     aboutMeSavePressed = () => {
         const updatedUserInfo = this.state.userInfo;
         updatedUserInfo.about = this.state.updatedAboutMeText;
+        submitAboutMe(updatedUserInfo.about).catch(_ => {
+            alert('There was a problem updating your profile.');
+        });
 
         this.setState({
             isEditingAboutMe: false,
@@ -99,10 +119,25 @@ export class UserProfile extends AuthenticatedComponent {
         return isSelectedBadge ? '#88ff88' : '#efefef';
     }
 
+    getPhoneEnabledSubtext = () => {
+        return 'If enabled, users may call you at any time, even if the app is not open. NOTE: ' + 
+            'Users you have blocked will not be able to find you or call you.';
+    }
+
     inputSizeChanged = () => {
         setTimeout(function() {
             this.scrollView.scrollToEnd({ animated: false });
         }.bind(this));
+    }
+
+    canBeCalledChanged = (value) => {
+        const userInfo = this.state.userInfo;
+        userInfo.canBeCalled = value;
+        this.setState({ userInfo });
+
+        setPhoneCallsEnabled(value).catch(_ => {
+            alert('There was a problem updating your profile.');
+        });
     }
 
     renderBadge = ({ item: badge }) => {
@@ -169,6 +204,21 @@ export class UserProfile extends AuthenticatedComponent {
                                         <Icon size={48} name='comment' type='font-awesome' color='#efefef' />
                                     </TouchableOpacity>
                                 </View>
+                            </View>
+                        }
+
+                        {
+                            this.state.isEditable && !this.state.isEditingAboutMe &&
+                            <View style={styles.phoneCallsEnabledContainer}>
+                                <View style={styles.phoneCallsToggleContainer}>
+                                    <Text style={styles.phoneCallsToggleLabel}>{'enable phone calls'}</Text>
+                                    <Switch 
+                                        style={styles.phoneEnabledSwitch}
+                                        value={this.state.userInfo.canBeCalled} 
+                                        onValueChange={this.canBeCalledChanged}>
+                                    </Switch>
+                                </View>
+                                <Text style={styles.phoneEnabledSubtext}>{this.getPhoneEnabledSubtext()}</Text>
                             </View>
                         }
 
@@ -433,5 +483,29 @@ const styles = StyleSheet.create({
     badgeDismissText: {
         color: '#222',
         fontSize: 22
+    },
+    phoneCallsEnabledContainer: {
+        alignItems: 'center',
+        marginTop: 10
+    },
+    phoneCallsToggleContainer: {
+        flexDirection: 'row'
+    },
+    phoneCallsToggleLabel: {
+        fontSize: 24,
+        color: '#efefef',
+        marginRight: 15
+    },
+    phoneEnabledSubtext: {
+        fontSize: 18,
+        color: '#ddd',
+        paddingLeft: 10,
+        paddingRight: 10
+    },
+    phoneEnabledSwitch: {
+        transform: [
+            { scaleX: 1.5 },
+            { scaleY: 1.5 }
+        ]
     }
 });
