@@ -5,6 +5,7 @@ import { ChatterUpLoadingSpinner } from './partial/ChatterUpLoadingSpinner';
 import { getUsers } from '../services/ChatterUpService';
 import { OnlineStatusDot } from './partial/OnlineStatusDot';
 import { AuthenticatedComponent } from '../shared/AuthenticatedComponent';
+import { IncomingCallOverlay } from '../shared/IncomingCallOverlay';
 
 export class Chat extends AuthenticatedComponent {
     static navigationOptions = {
@@ -26,7 +27,7 @@ export class Chat extends AuthenticatedComponent {
     }
 
     userSelected = (username) => {
-        this.props.navigation.navigate('UserProfile', { username });
+        this.goTo('UserProfile', { username });
     }
 
     // CREDIT: found at https://stackoverflow.com/questions/10599933
@@ -89,6 +90,11 @@ export class Chat extends AuthenticatedComponent {
                         <FlatList data={this.state.users} renderItem={this.renderList}></FlatList>
                     </View>
                 }
+
+                <IncomingCallOverlay 
+                    navigation={this.props.navigation}
+                    incomingCallChannel={this.getIncomingMessageChannel()}>
+                </IncomingCallOverlay>
             </View>
         );
     }

@@ -5,6 +5,7 @@ import { doesUsernameExist, getReportCategories, submitUserReport } from '../../
 import { ChatterUpLoadingSpinner } from '../partial/ChatterUpLoadingSpinner';
 import { Icon } from 'react-native-elements';
 import { AuthenticatedComponent } from '../../shared/AuthenticatedComponent';
+import { IncomingCallOverlay } from '../../shared/IncomingCallOverlay';
 
 export class Report extends AuthenticatedComponent {
     static navigationOptions = {
@@ -124,7 +125,7 @@ export class Report extends AuthenticatedComponent {
                 description: this.state.description
             }).then(
                 () => {
-                    this.props.navigation.navigate('ReportConfirmed');
+                    this.goTo('ReportConfirmed');
                 },
                 errorMessage => {
                     alert(errorMessage);
@@ -267,6 +268,11 @@ export class Report extends AuthenticatedComponent {
                     this.state.isFormSubmitted && 
                     <ChatterUpLoadingSpinner></ChatterUpLoadingSpinner>
                 }
+
+                <IncomingCallOverlay 
+                    navigation={this.props.navigation}
+                    incomingCallChannel={this.getIncomingMessageChannel()}>
+                </IncomingCallOverlay>
             </View>
         );
     }

@@ -43,4 +43,19 @@ export class AuthenticatedComponent extends React.Component {
             }
         })
     }
+
+    getIncomingMessageChannel = () => {
+        return this.props.navigation.getParam('incomingMessageChannel');
+    }
+
+    /** Go to the given view name with optional navigation params. Will add incomingMessageChannel prop
+     * as param so incoming messages through socket may be handled on any authenticated page.
+     */
+    goTo = (viewName, navigationParams) => {
+        const { navigate } = this.props.navigation;
+        const params = navigationParams || {};
+        params.incomingMessageChannel = this.getIncomingMessageChannel();
+
+        navigate(viewName, params);
+    }
 }

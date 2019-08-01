@@ -1,5 +1,6 @@
 import { AsyncStorage } from 'react-native';
 import { getApiUrl } from '../shared/Constants';
+import { beginListenForIncomingCalls } from './ChatterUpService';
 
 // todo: refresh token periodically
 export const authenticate = () => {

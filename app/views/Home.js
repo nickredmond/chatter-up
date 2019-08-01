@@ -2,8 +2,9 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { MainMenu } from './partial/MainMenu';
 import { Login } from './partial/Login';
-import { authenticate } from '../services/AuthService';
+import { authenticate, getSocketReceiveId } from '../services/AuthService';
 import { IncomingCallOverlay } from '../shared/IncomingCallOverlay';
+import { getPusherInstance } from '../shared/Constants';
 
 export class Home extends React.Component {
     static navigationOptions = {
@@ -19,23 +20,47 @@ export class Home extends React.Component {
         };
 
         authenticate().then(response => {
-            this.setState({
-                isAuthenticated: response.isValid,
-                isLoading: false
-            });
-
-            if (response.isValid && !response.isPhoneNumberConfirmed) {
-                const phoneNumberExists = response.phoneNumberExists;
-                this.props.navigation.navigate('PhoneNumberConfirmation', { phoneNumberExists });
+            if (response.isValid) {
+                this.authenticated().catch(err => {
+                    alert('There was a problem listening for incoming calls. ' + err);
+                });
+                if (!response.isPhoneNumberConfirmed) {
+                    const phoneNumberExists = response.phoneNumberExists;
+                    this.goTo('PhoneNumberConfirmation', { phoneNumberExists });
+                }
             }
         });
     }
 
+    componentWillUnmount() {
+        const socket = this.state.socket;
+        const socketRecieveId = this.state.socketRecieveId;
+        if (socket && socketRecieveId) {
+            socket.unsubscribe(socketRecieveId);
+        }
+    }
+
+    authenticated = async () => {
+        const socketRecieveId = await getSocketReceiveId();
+        const socket = getPusherInstance();
+        const incomingMessageChannel = socket.subscribe(socketRecieveId);
+
+        this.setState({ 
+            isAuthenticated: true, 
+            isLoading: false,
+            socket, 
+            socketRecieveId,
+            incomingMessageChannel
+        });
+    }
+
     loggedIn = (response) => {
-        this.setState({ isAuthenticated: true });
+        this.authenticated().catch(err => {
+            alert('There was a problem listening for incoming calls. ' + err);
+        });
 
         if (!(response.phoneNumberExists && response.phoneNumberVerified)) {
-            this.props.navigation.navigate('PhoneNumberConfirmation', {
+            this.goTo('PhoneNumberConfirmation', {
                 phoneNumberExists: response.phoneNumberExists
             });
         }
@@ -46,18 +71,18 @@ export class Home extends React.Component {
     }
 
     createdUser = () => {
-        this.setState({ isAuthenticated: true });
-        this.props.navigation.navigate('AboutMe');
+        this.authenticated().catch(_ => {
+            alert('There was a problem listening for incoming calls.');
+        });
+        this.goTo('AboutMe');
     }
 
     goTo = (viewName, navigationParams) => {
         const { navigate } = this.props.navigation;
-        if (navigationParams) {
-            navigate(viewName, navigationParams);
-        }
-        else {
-            navigate(viewName);
-        }
+        const params = navigationParams || {};
+        params.incomingMessageChannel = this.state.incomingMessageChannel;
+
+        navigate(viewName, params);
     }
 
     render() {
@@ -92,7 +117,10 @@ export class Home extends React.Component {
 
                 {
                     this.state.isAuthenticated && 
-                    <IncomingCallOverlay></IncomingCallOverlay>
+                    <IncomingCallOverlay 
+                        navigation={this.props.navigation}
+                        incomingCallChannel={this.state.incomingMessageChannel}>
+                    </IncomingCallOverlay>
                 }
             </View>
         );

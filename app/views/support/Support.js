@@ -3,6 +3,7 @@ import { View, Text, StyleSheet } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { Icon } from 'react-native-elements';
 import { AuthenticatedComponent } from '../../shared/AuthenticatedComponent';
+import { IncomingCallOverlay } from '../../shared/IncomingCallOverlay';
 
 export class Support extends AuthenticatedComponent {
     static navigationOptions = {
@@ -11,10 +12,6 @@ export class Support extends AuthenticatedComponent {
 
     constructor(props) {
         super(props);
-    }
-
-    goTo = (viewName) => {
-        this.props.navigation.navigate(viewName);
     }
 
     render() {
@@ -32,6 +29,11 @@ export class Support extends AuthenticatedComponent {
                         <Icon size={48} name='headphones' type='font-awesome' color='#efefef'></Icon>
                         <Text style={styles.supportButtonText}>{'contact'}</Text>
                 </TouchableOpacity>
+
+                <IncomingCallOverlay 
+                    navigation={this.props.navigation}
+                    incomingCallChannel={this.getIncomingMessageChannel()}>
+                </IncomingCallOverlay>
             </View>
         );
     }

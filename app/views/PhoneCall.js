@@ -2,6 +2,7 @@ import React from 'react';
 import { View, StyleSheet, Text, Linking } from 'react-native';
 import { AuthenticatedComponent } from '../shared/AuthenticatedComponent';
 import { ChatterUpLoadingSpinner } from './partial/ChatterUpLoadingSpinner';
+import { IncomingCallOverlay } from '../shared/IncomingCallOverlay';
 import { initializeCall } from '../services/ChatterUpService';
 import { getFormattedPhoneNumber } from '../shared/Constants';
 
@@ -12,6 +13,7 @@ const LoadingStates = {
     DIALING: 'dialing',
     NONE: 'none'
 };
+const timerHandles = [];
 export class PhoneCall extends AuthenticatedComponent {
     constructor(props) {
         super(props);
@@ -29,16 +31,17 @@ export class PhoneCall extends AuthenticatedComponent {
                     loadingState: LoadingStates.NOTIFYING_USER,
                     loadingText: this.getLoadingText(LoadingStates.NOTIFYING_USER)
                 });
-                setTimeout(self => {
+                const notifyUserTimeout = setTimeout(self => {
                     self.setState({ 
                         loadingState: LoadingStates.DIALING,
                         loadingText: self.getLoadingText(LoadingStates.DIALING)
                     });
-                    setTimeout(() => {
+                    const dialingTimeout = setTimeout(() => {
                         Linking.openURL('tel:' + virtualNumber).catch(_ => {
                             alert('Problem dialing phone number.');
                         });
                     }, 250);
+                    timerHandles.push(dialingTimeout);
 
                     // TODO: investigate if I can see when phone is in-call and then 
                     //      update UI accordingly :tada:
@@ -49,11 +52,18 @@ export class PhoneCall extends AuthenticatedComponent {
                     //     });
                     // }, 2000, self);
                 }, NOTIFY_USER_TIMEOUT, this);
+                timerHandles.push(notifyUserTimeout);
             },
             errorMessage => {
                 alert(errorMessage);
             }
         )
+    }
+
+    componentWillUnmount() {
+        timerHandles.forEach(handle => {
+            clearTimeout(handle);
+        });
     }
 
     getLoadingText = (loadingState) => {
@@ -96,7 +106,13 @@ export class PhoneCall extends AuthenticatedComponent {
                     </View>
                 }
                 {/* TODO: maybe add 'home' button or something, like in report-submitted? */}
+                {/* v1.1: on phone call ended, send Pusher-msg from server (/event) to client, and auto-navigate? */}
                 {/* TODO: also, add button to open telephone prompt again in case they exit accidentally */}
+            
+                <IncomingCallOverlay 
+                    navigation={this.props.navigation}
+                    incomingCallChannel={this.getIncomingMessageChannel()}>
+                </IncomingCallOverlay>
             </View>
         );
     }

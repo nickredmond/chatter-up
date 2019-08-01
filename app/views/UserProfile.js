@@ -8,6 +8,7 @@ import { TouchableOpacity, TextInput, ScrollView, TouchableWithoutFeedback, Swit
 import moment from 'moment';
 import { AuthenticatedComponent } from '../shared/AuthenticatedComponent';
 import { getCurrentUsername } from '../services/AuthService';
+import { IncomingCallOverlay } from '../shared/IncomingCallOverlay';
 
 export class UserProfile extends AuthenticatedComponent {
     constructor(props) {
@@ -63,7 +64,7 @@ export class UserProfile extends AuthenticatedComponent {
 
     navigateToUser = (viewName) => {
         const username = this.state.userInfo.username;
-        this.props.navigation.navigate(viewName, { username });
+        this.goTo(viewName, { username });
     }
     phoneButtonPressed = () => {
         this.navigateToUser('PhoneCall');
@@ -317,6 +318,11 @@ export class UserProfile extends AuthenticatedComponent {
                         }
                     </View>
                 }
+
+                <IncomingCallOverlay 
+                    navigation={this.props.navigation}
+                    incomingCallChannel={this.getIncomingMessageChannel()}>
+                </IncomingCallOverlay>
             </View>
         );
     }

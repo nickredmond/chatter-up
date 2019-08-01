@@ -1,8 +1,10 @@
 import React from 'react';
 import { View, StyleSheet, Text, BackHandler } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
+import { IncomingCallOverlay } from '../../shared/IncomingCallOverlay';
+import { AuthenticatedComponent } from '../../shared/AuthenticatedComponent';
 
-export class ReportConfirmed extends React.Component {
+export class ReportConfirmed extends AuthenticatedComponent {
     static navigationOptions = {
         title: 'report submitted',
         headerLeft: null
@@ -25,7 +27,7 @@ export class ReportConfirmed extends React.Component {
     }
 
     goHome = () => {
-        this.props.navigation.navigate('Home');
+        this.goTo('Home');
     }
 
     render() {
@@ -36,6 +38,11 @@ export class ReportConfirmed extends React.Component {
                 <TouchableOpacity style={styles.homeButton} onPress={this.goHome}>
                     <Text style={styles.homeButtonText}>{'home'}</Text>
                 </TouchableOpacity>
+
+                <IncomingCallOverlay 
+                    navigation={this.props.navigation}
+                    incomingCallChannel={this.getIncomingMessageChannel()}>
+                </IncomingCallOverlay>
             </View>
         );
     }

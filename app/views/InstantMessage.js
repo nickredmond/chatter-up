@@ -6,6 +6,7 @@ import AutogrowInput from 'react-native-autogrow-input';
 import { getUsername, getMessages, openChatConnection, sendMessage } from '../services/ChatterUpService';
 import { AuthenticatedComponent } from '../shared/AuthenticatedComponent';
 import { getPusherInstance } from '../shared/Constants';
+import { IncomingCallOverlay } from '../shared/IncomingCallOverlay';
 
 /**
  * These components were originally written by GitHub user @llamaluvr and were published at 
@@ -200,6 +201,11 @@ export class InstantMessage extends AuthenticatedComponent {
                     <KeyboardSpacer/>             
                 </View>
             }
+
+            <IncomingCallOverlay 
+                navigation={this.props.navigation}
+                incomingCallChannel={this.getIncomingMessageChannel()}>
+            </IncomingCallOverlay>
         </View>
     );
   }

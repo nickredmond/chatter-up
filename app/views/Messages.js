@@ -6,6 +6,7 @@ import { OnlineStatusDot } from './partial/OnlineStatusDot';
 import { getMessageLists } from '../services/ChatterUpService';
 import moment from 'moment';
 import { AuthenticatedComponent } from '../shared/AuthenticatedComponent';
+import { IncomingCallOverlay } from '../shared/IncomingCallOverlay';
 
 export class Messages extends AuthenticatedComponent {
     static navigationOptions = {
@@ -31,7 +32,7 @@ export class Messages extends AuthenticatedComponent {
     }
 
     messagePreviewPressed = (username, channelId) => {
-        this.props.navigation.navigate('InstantMessage', { username, channelId });
+        this.goTo('InstantMessage', { username, channelId });
     }
 
     renderList = ({ item: messagePreview }) => {
@@ -79,6 +80,11 @@ export class Messages extends AuthenticatedComponent {
                         >
                     </FlatList>
                 }
+
+                <IncomingCallOverlay 
+                    navigation={this.props.navigation}
+                    incomingCallChannel={this.getIncomingMessageChannel()}>
+                </IncomingCallOverlay>
             </View>
         );
     }
