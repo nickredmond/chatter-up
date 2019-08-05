@@ -1,8 +1,9 @@
 import React from 'react';
 import { View, StyleSheet, Picker, Text, Keyboard } from 'react-native';
 import { TouchableOpacity, TextInput } from 'react-native-gesture-handler';
-import { doesUsernameExist, getReportCategories, submitUserReport } from '../../services/ChatterUpService';
+import { getReportCategories, submitUserReport } from '../../services/ChatterUpService';
 import { ChatterUpLoadingSpinner } from '../partial/ChatterUpLoadingSpinner';
+import { UsernameCheck } from '../partial/UsernameCheck';
 import { Icon } from 'react-native-elements';
 import { AuthenticatedComponent } from '../../shared/AuthenticatedComponent';
 import { IncomingCallOverlay } from '../../shared/IncomingCallOverlay';
@@ -46,35 +47,8 @@ export class Report extends AuthenticatedComponent {
         this.setState({ isShowingDisclaimer: false });
     }
 
-    getUsernameNotFoundMessage = () => {
-        return 'We couldn\'t find that username. If you can\'t remember it then we will try our best ' + 
-            'to find a match, and will let you know either way.';
-    }
-
     usernameValueChanged = (username) => {
-        this.setState({ 
-            username, 
-            usernameRequired: false,
-            usernameFound: null 
-        });
-    }
-
-    checkUsernameValue = () => {
-        const username = this.state.username;
-        if (username) {
-            this.setState({ searchingUsername: true });
-            doesUsernameExist(username).then(
-                wasUsernameFound => {
-                    this.setState({ 
-                        usernameFound: wasUsernameFound,
-                        searchingUsername: false
-                    });
-                },
-                _ => {
-                    alert('There was a problem checking username. ');
-                }
-            );
-        }
+        this.setState({ username, usernameRequired: false });
     }
 
     reportCategoryChanged = (selectedCategory) => {
@@ -154,57 +128,12 @@ export class Report extends AuthenticatedComponent {
 
                 {
                     !this.state.isShowingDisclaimer && !this.state.isEditingDescription && 
-                    <View style={styles.shortFormContainer}>
-                        <Text style={[styles.inputLabel, styles.usernameInputLabel]}>{'username being reported'}</Text>
-                        <View style={styles.usernameInputGroup}>
-                            <TextInput 
-                                value={this.state.username}
-                                style={[styles.input, styles.usernameInput]}
-                                onChangeText={this.usernameValueChanged}
-                                placeholder={'Enter username...'}
-                                placeholderTextColor={'#888'}>
-                            </TextInput>
-                            {
-                                !this.state.searchingUsername && this.state.usernameFound === null &&
-                                <TouchableOpacity 
-                                    style={[styles.usernameCheckButton, styles.enabledCheckButton]}
-                                    onPress={this.checkUsernameValue} 
-                                    >
-                                    <Text style={styles.usernameCheckButtonText}>{'check'}</Text>
-                                </TouchableOpacity>
-                            }
-                            {
-                                !this.state.searchingUsername && this.state.usernameFound === false && 
-                                <TouchableOpacity disabled style={[styles.usernameCheckButton, styles.disabledCheckButton]}>
-                                    <Text style={styles.usernameCheckButtonText}>{'check'}</Text>
-                                </TouchableOpacity>
-                            }
-                            {
-                                !this.state.searchingUsername && this.state.usernameFound === true && 
-                                <TouchableOpacity disabled style={[styles.usernameCheckButton, styles.foundCheckButton]}>
-                                    <Icon size={24} name='check' style='font-awesome'></Icon>
-                                </TouchableOpacity>
-                            }
-                            {
-                                this.state.searchingUsername && 
-                                <TouchableOpacity disabled style={[styles.usernameCheckButton, styles.disabledCheckButton]}>
-                                    <ChatterUpLoadingSpinner size={'small'} withoutMargin={true}></ChatterUpLoadingSpinner>
-                                </TouchableOpacity>
-                            }
-                        </View>
-                        {
-                            (this.state.usernameFound === false) && 
-                            <Text style={styles.validationMessage}>{this.getUsernameNotFoundMessage()}</Text>
-                        }
-                        {
-                            (this.state.usernameFound === true) && 
-                            <Text style={styles.usernameFoundMessage}>{'Username found.'}</Text>
-                        }
-                        {
-                            this.state.usernameRequired && 
-                            <Text style={styles.validationMessage}>{'Username is required.'}</Text>
-                        }
-                    </View>
+                    <UsernameCheck 
+                        username={this.state.username}
+                        usernameChanged={this.usernameValueChanged}
+                        usernameRequired={this.state.usernameRequired}
+                        >
+                    </UsernameCheck>
                 }
                 {
                     !this.state.isShowingDisclaimer && !this.state.isEditingDescription &&
@@ -355,47 +284,11 @@ const styles = StyleSheet.create({
         marginLeft: 20,
         marginRight: 20
     },
-    usernameInputGroup: {
-        flexDirection: 'row',
-        marginTop: 10,
-        paddingLeft: 10,
-        paddingRight: 10
-    },
-    usernameInputLabel: {
-        marginTop: 20
-    },
-    usernameInput: {
-        flex: 1,
-        paddingLeft: 5,
-        fontSize: 18
-    },  
-    usernameCheckButton: {
-        padding: 5
-    },
-    enabledCheckButton: {
-        backgroundColor: 'blue'
-    },
-    disabledCheckButton: {
-        backgroundColor: '#444'
-    },
-    foundCheckButton: {
-        backgroundColor: '#aaddaa'
-    },
-    usernameCheckButtonText: {
-        color: '#efefef',
-        fontSize: 20
-    },
     validationMessage: {
         color: '#efcccc',
         alignSelf: 'flex-start',
         paddingLeft: 10,
         paddingRight: 10,
-        paddingTop: 5
-    },
-    usernameFoundMessage: {
-        color: '#ccefcc',
-        alignSelf: 'flex-start',
-        paddingLeft: 10,
         paddingTop: 5
     },
     pickerStyle: {
