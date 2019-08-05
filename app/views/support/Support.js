@@ -21,9 +21,13 @@ export class Support extends AuthenticatedComponent {
                         <Icon size={48} name='question' type='font-awesome' color='#efefef'></Icon>
                         <Text style={styles.supportButtonText}>{'faq'}</Text>
                 </TouchableOpacity>
+                <TouchableOpacity style={styles.supportButton} onPress={() => this.goTo('Block')}>
+                        <Icon size={48} name='times' type='font-awesome' color='#efefef'></Icon>
+                        <Text style={styles.supportButtonText}>{'block user'}</Text>
+                </TouchableOpacity>
                 <TouchableOpacity style={styles.supportButton} onPress={() => this.goTo('Report')}>
                         <Icon size={48} name='exclamation' type='font-awesome' color='#efefef'></Icon>
-                        <Text style={styles.supportButtonText}>{'report'}</Text>
+                        <Text style={styles.supportButtonText}>{'report user'}</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.supportButton} onPress={() => this.goTo('Contact')}>
                         <Icon size={48} name='headphones' type='font-awesome' color='#efefef'></Icon>

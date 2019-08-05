@@ -11,7 +11,8 @@ export class UsernameCheck extends React.Component {
 
         this.state = {
             username: this.props.username || '',
-            usernameFound: null
+            usernameFound: null,
+            inputLabelText: this.props.inputLabelText || 'username'
         };
     }
 
@@ -56,7 +57,7 @@ export class UsernameCheck extends React.Component {
     render() {
         return (
             <View style={styles.container}>
-                <Text style={[styles.inputLabel, styles.usernameInputLabel]}>{'username being reported'}</Text>
+                <Text style={[styles.inputLabel, styles.usernameInputLabel]}>{this.state.inputLabelText}</Text>
                 <View style={styles.usernameInputGroup}>
                     <TextInput 
                         value={this.state.username}

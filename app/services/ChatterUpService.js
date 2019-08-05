@@ -194,6 +194,11 @@ export const setPhoneCallsEnabled = (enabled) => {
     return sendAuthenticatedRequest('/profile/calls/' + actionPath, null, hasResponse);
 }
 
+export const blockUser = (username) => {
+    const hasResponse = false;
+    return sendAuthenticatedRequest('/username/block', { username }, hasResponse);
+}
+
 // export const registerForIncomingCallMessages = async (callbackId, callback) => {
 //     const callbacksString = await AsyncStorage.getItem('incomingCallbacksById');
 //     const incomingCallbacksById = callbacksString ? JSON.parse(callbacksString) : {};

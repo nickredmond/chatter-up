@@ -129,7 +129,8 @@ export class Report extends AuthenticatedComponent {
                 {
                     !this.state.isShowingDisclaimer && !this.state.isEditingDescription && 
                     <UsernameCheck 
-                        username={this.state.username}
+                        username={this.state.username} 
+                        inputLabelText={'username being reported'}
                         usernameChanged={this.usernameValueChanged}
                         usernameRequired={this.state.usernameRequired}
                         >
