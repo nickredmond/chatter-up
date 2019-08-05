@@ -29,6 +29,7 @@ export class IncomingCallOverlay extends React.Component {
         this.props.incomingCallChannel.bind('incoming-call', incomingCallHandler);
     }
 
+    // todo: this isn't working and isn't preventing more connections from being made, I think
     componentDidMount () {
         this.props.navigation.addListener(
             'didBlur',

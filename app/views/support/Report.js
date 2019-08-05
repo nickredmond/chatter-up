@@ -16,16 +16,11 @@ export class Report extends AuthenticatedComponent {
         super(props);
         this.state = { 
             isShowingDisclaimer: true,
-            canDimissDisclaimer: false,
+            canDimissDisclaimer: true, // setting to false hides OK button
             usernameFound: null,
             username: '',
             defaultCategory: 'Select category...'
         };
-
-        // todo: maybe provide option after first time to not show again
-        setTimeout(() => {
-            this.setState({ canDimissDisclaimer: true });
-        }, 5000); 
 
         getReportCategories().then(
             categories => {
@@ -75,8 +70,8 @@ export class Report extends AuthenticatedComponent {
                         searchingUsername: false
                     });
                 },
-                errorMessage => {
-                    alert(errorMessage);
+                _ => {
+                    alert('There was a problem checking username. ');
                 }
             );
         }
@@ -124,7 +119,7 @@ export class Report extends AuthenticatedComponent {
                 category: this.state.selectedCategory,
                 description: this.state.description
             }).then(
-                () => {
+                _ => {
                     this.goTo('ReportConfirmed');
                 },
                 errorMessage => {

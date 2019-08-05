@@ -19,17 +19,24 @@ export class Home extends React.Component {
             isAuthenticated: false
         };
 
-        authenticate().then(response => {
-            if (response.isValid) {
-                this.authenticated().catch(err => {
-                    alert('There was a problem listening for incoming calls. ' + err);
-                });
-                if (!response.isPhoneNumberConfirmed) {
-                    const phoneNumberExists = response.phoneNumberExists;
-                    this.goTo('PhoneNumberConfirmation', { phoneNumberExists });
+        authenticate().then(
+            response => {
+                if (response.isValid) {
+                    this.authenticated().catch(err => {
+                        alert('There was a problem listening for incoming calls. ' + err);
+                    });
+                    if (!response.isPhoneNumberConfirmed) {
+                        const phoneNumberExists = response.phoneNumberExists;
+                        this.goTo('PhoneNumberConfirmation', { phoneNumberExists });
+                    }
                 }
-            }
-        });
+                else {
+                    this.setState({ isLoading: false });
+                }
+            },
+            _ => {
+                this.setState({ isLoading: false });
+            });
     }
 
     componentWillUnmount() {

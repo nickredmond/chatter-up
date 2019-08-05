@@ -94,13 +94,9 @@ export const getMessageLists = () => {
     return sendAuthenticatedRequest('/messages/list');
 }
 
-export const doesUsernameExist = (username) => {
-    return new Promise((resolve, reject) => {
-        setTimeout(() => {
-            const result = Math.random() >= 0.5;
-            resolve(result);
-        }, 500);
-    })
+export const doesUsernameExist = async (username) => {
+    const responseBody = await sendAuthenticatedRequest('/username/exists', { username });
+    return responseBody.exists;
 }
 
 // todo: maybe get these from server so they may updated on the fly? 
@@ -119,11 +115,8 @@ export const getReportCategories = () => {
 }
 
 export const submitUserReport = (userReport) => {
-    return new Promise((resolve, reject) => {
-        setTimeout(() => {
-            resolve();
-        }, 2000);
-    })
+    const hasResponse = false;
+    return sendAuthenticatedRequest('/report', userReport, hasResponse);
 }
 
 export const initializeCall = (username) => {
