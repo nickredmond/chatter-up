@@ -5,6 +5,8 @@ import { ChatterUpLoadingSpinner } from './partial/ChatterUpLoadingSpinner';
 import { IncomingCallOverlay } from '../shared/IncomingCallOverlay';
 import { initializeCall } from '../services/ChatterUpService';
 import { getFormattedPhoneNumber } from '../shared/Constants';
+import { TouchableOpacity } from 'react-native-gesture-handler';
+import { Icon } from 'react-native-elements';
 
 const NOTIFY_USER_TIMEOUT = 3000;
 const LoadingStates = {
@@ -36,21 +38,6 @@ export class PhoneCall extends AuthenticatedComponent {
                         loadingState: LoadingStates.DIALING,
                         loadingText: self.getLoadingText(LoadingStates.DIALING)
                     });
-                    const dialingTimeout = setTimeout(() => {
-                        Linking.openURL('tel:' + virtualNumber).catch(_ => {
-                            alert('Problem dialing phone number.');
-                        });
-                    }, 250);
-                    timerHandles.push(dialingTimeout);
-
-                    // TODO: investigate if I can see when phone is in-call and then 
-                    //      update UI accordingly :tada:
-                    // setTimeout(innerSelf => {
-                    //     innerSelf.setState({ 
-                    //         loadingState: LoadingStates.NONE,
-                    //         loadingText: innerSelf.getLoadingText(LoadingStates.NONE)
-                    //     });
-                    // }, 2000, self);
                 }, NOTIFY_USER_TIMEOUT, this);
                 timerHandles.push(notifyUserTimeout);
             },
@@ -76,7 +63,7 @@ export class PhoneCall extends AuthenticatedComponent {
                 loadingText = 'notifying user...';
                 break;
             case LoadingStates.DIALING: 
-                loadingText = 'dialing...';
+                loadingText = 'ready to call!';
                 break;
             default: 
                 loadingText = 'loading...';
@@ -87,8 +74,23 @@ export class PhoneCall extends AuthenticatedComponent {
 
     getDialingSubtext = () => {
         const formattedNumber = getFormattedPhoneNumber(this.state.virtualNumber);
-        return 'You may be prompted to dial the number "' + formattedNumber + '", ' +
-            'which will connect you to user "' + this.state.otherUsername + '".';
+        return 'Press "dial" to open your device\'s phone app for phone number "' + formattedNumber + '". ' +
+            'Calling this private number will connect you to user "' + this.state.otherUsername + '".';
+    }
+
+    getNumberText = () => {
+        const formattedNumber = getFormattedPhoneNumber(this.state.virtualNumber);
+        return 'number: ' + formattedNumber;
+    }
+
+    getUserText = () => {
+        return 'user: ' + this.state.otherUsername;
+    }
+
+    dialNumber = () => {
+        Linking.openURL('tel:' + this.state.virtualNumber).catch(_ => {
+            alert('Problem dialing phone number.');
+        });
     }
 
     render() {
@@ -99,16 +101,44 @@ export class PhoneCall extends AuthenticatedComponent {
                     <View style={styles.loadingView}>
                         <Text style={styles.loadingText}>{this.state.loadingText}</Text>
                         {
-                            this.state.loadingState === LoadingStates.DIALING && 
-                            <Text style={styles.subtext}>{this.getDialingSubtext()}</Text>
+                            this.state.loadingState !== LoadingStates.DIALING && 
+                            <ChatterUpLoadingSpinner></ChatterUpLoadingSpinner>
                         }
-                        <ChatterUpLoadingSpinner></ChatterUpLoadingSpinner>
+                        {
+                            this.state.loadingState === LoadingStates.DIALING && 
+                            <View>
+                                <Text style={styles.subtext}>{this.getNumberText()}</Text>
+                                <Text style={styles.subtext}>{this.getUserText()}</Text>
+                            </View>
+                        }
+
+                        <TouchableOpacity 
+                            style={[styles.button, styles.homeButton]}
+                            onPress={() => this.goTo('Home')}
+                            >
+                            <Icon size={28} name='home' type='font-awesome' color='#222' />
+                            <Text style={[styles.buttonText, styles.homeButtonText]}>{'home'}</Text>
+                        </TouchableOpacity>
+                        {
+                            this.state.loadingState === LoadingStates.DIALING && 
+                            <TouchableOpacity 
+                                style={[styles.button, styles.callButton]}
+                                onPress={this.dialNumber}
+                                >
+                                <Icon size={28} name='phone' type='font-awesome' color='#efefef' />
+                                <Text style={[styles.buttonText, styles.callButtonText]}>{'dial'}</Text>
+                            </TouchableOpacity>
+                        }
                     </View>
                 }
-                {/* TODO: maybe add 'home' button or something, like in report-submitted? */}
-                {/* v1.1: on phone call ended, send Pusher-msg from server (/event) to client, and auto-navigate? */}
-                {/* TODO: also, add button to open telephone prompt again in case they exit accidentally */}
-            
+                {/* event: call started, Pusher to change to in-call view */}
+                {/* event: call ended, Pusher to change to after-call view  
+                    call ended
+                    time in call: 52 min
+                    how would you rate the person you talked with?
+                    (smileys)
+                    [ submit rating ]
+                */}
                 <IncomingCallOverlay 
                     navigation={this.props.navigation}
                     incomingCallChannel={this.getIncomingMessageChannel()}>
@@ -122,7 +152,8 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#222',
-        alignItems: 'center'
+        alignItems: 'center',
+        alignSelf: 'stretch'
     },
     loadingView: {
         alignItems: 'center'
@@ -134,9 +165,42 @@ const styles = StyleSheet.create({
     },
     subtext: {
         color: '#efefef',
-        fontSize: 20,
+        fontSize: 24,
         marginLeft: 15,
         marginRight: 15,
         marginTop: 10
+    },
+    button: {
+        flexDirection: 'row',
+        alignSelf: 'stretch',
+        justifyContent: 'center',
+        paddingTop: 10,
+        paddingBottom: 10,
+        paddingLeft: 25,
+        paddingRight: 25,
+        marginLeft: 50,
+        marginRight: 50,
+        marginBottom: 20,
+        minWidth: 100
+    },
+    homeButton: {
+        marginTop: 25,
+        backgroundColor: '#ddd',
+        borderColor: '#aaa',
+        borderRadius: 2,
+        borderWidth: 1
+    },
+    callButton: {
+        backgroundColor: '#00B706'
+    },
+    buttonText: {
+        fontSize: 24,
+        marginLeft: 10
+    },
+    homeButtonText: {
+        color: '#222'
+    },
+    callButtonText: {
+        color: '#efefef'
     }
 });
