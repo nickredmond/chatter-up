@@ -55,7 +55,8 @@ export const authenticate = () => {
 }
 
 export const saveAuthResponseData = (username, response, resolve, reject) => {
-    AsyncStorage.setItem('username', username, (err) => {
+    const formattedUsername = username.toLowerCase();
+    AsyncStorage.setItem('username', formattedUsername, (err) => {
         if (err) {
             reject('Error saving to device storage.');
         }
