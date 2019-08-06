@@ -199,44 +199,7 @@ export const blockUser = (username) => {
     return sendAuthenticatedRequest('/username/block', { username }, hasResponse);
 }
 
-// export const registerForIncomingCallMessages = async (callbackId, callback) => {
-//     const callbacksString = await AsyncStorage.getItem('incomingCallbacksById');
-//     const incomingCallbacksById = callbacksString ? JSON.parse(callbacksString) : {};
-//     incomingCallbacksById["nick"] = "redmond";
-//     incomingCallbacksById[callbackId.toString()] = callback;
-//     alert('yep ' + JSON.stringify(incomingCallbacksById) + ', ' + callbackId + ', ' + callback)
-//     AsyncStorage.setItem('incomingCallbacksById', JSON.stringify(incomingCallbacksById));
-// }
-
-// export const unregisterFromIncomingCallMessages = async (callbackId) => {
-//     const incomingCallbacksById = JSON.parse(await AsyncStorage.getItem('incomingCallbacksById') || '{}');
-//     delete incomingCallbacksById[callbackId];
-//     AsyncStorage.setItem('incomingCallbacksById', JSON.stringify(incomingCallbacksById));
-// }
-
-// export const beginListenForIncomingCalls = (socketRecieveId) => {
-//     alert('meh')
-//     const socket = getPusherInstance();
-//     const channel = socket.subscribe(socketRecieveId);
-
-//     channel.bind('incoming-call', incomingCallMessage => {
-//         alert('hell yeah')
-//         AsyncStorage.getItem('incomingCallbacksById', (err, callbacksString) => {
-//             alert('hm1')
-//             if (callbacksString) {
-//                 alert('hm2 ' + callbacksString)
-//                 const incomingCallbacksById = JSON.parse(callbacksString);
-//                 const callbackIds = Object.keys(incomingCallbacksById);
-//                 if (callbackIds.length > 0) {
-//                     alert('hm3')
-//                     const phoneNumber = incomingCallMessage.phoneNumber;
-//                     const username = incomingCallMessage.username;
-//                     callbackIds.forEach(id => {
-//                         const callback = incomingCallbacksById[id];
-//                         callback(phoneNumber, username);
-//                     });
-//                 }
-//             }
-//         });
-//     });
-// }
+export const submitCallRating = (callId, rating) => {
+    const hasResponse = false;
+    return sendAuthenticatedRequest('/call/' + callId + '/rate', { rating }, hasResponse);
+}

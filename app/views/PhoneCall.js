@@ -3,7 +3,7 @@ import { View, StyleSheet, Text, Linking } from 'react-native';
 import { AuthenticatedComponent } from '../shared/AuthenticatedComponent';
 import { ChatterUpLoadingSpinner } from './partial/ChatterUpLoadingSpinner';
 import { IncomingCallOverlay } from '../shared/IncomingCallOverlay';
-import { initializeCall } from '../services/ChatterUpService';
+import { initializeCall, submitCallRating } from '../services/ChatterUpService';
 import { getFormattedPhoneNumber } from '../shared/Constants';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { Icon } from 'react-native-elements';
@@ -25,7 +25,7 @@ export class PhoneCall extends AuthenticatedComponent {
         const otherUsername = this.props.navigation.getParam('username');
         this.state = {
             otherUsername,
-            loadingState: LoadingStates.CALL_BEGAN,//LoadingStates.HIDING_NUMBER,
+            loadingState: LoadingStates.HIDING_NUMBER,
             loadingText: this.getLoadingText(LoadingStates.HIDING_NUMBER),
 
             ratingButtonStyle_ok: styles.unselectedRatingButton,
@@ -39,26 +39,26 @@ export class PhoneCall extends AuthenticatedComponent {
             iconColor_great: '#efefef',
         };
         
-        // initializeCall(otherUsername).then(
-        //     virtualNumber => {
-        //         this.setState({ 
-        //             virtualNumber,
-        //             loadingState: LoadingStates.NOTIFYING_USER,
-        //             loadingText: this.getLoadingText(LoadingStates.NOTIFYING_USER)
-        //         });
-        //         const notifyUserTimeout = setTimeout(self => {
-        //             self.beginListenForCallEnded();
-        //             self.setState({ 
-        //                 loadingState: LoadingStates.DIALING,
-        //                 loadingText: self.getLoadingText(LoadingStates.DIALING)
-        //             });
-        //         }, NOTIFY_USER_TIMEOUT, this);
-        //         timerHandles.push(notifyUserTimeout);
-        //     },
-        //     errorMessage => {
-        //         alert(errorMessage);
-        //     }
-        // )
+        initializeCall(otherUsername).then(
+            virtualNumber => {
+                this.setState({ 
+                    virtualNumber,
+                    loadingState: LoadingStates.NOTIFYING_USER,
+                    loadingText: this.getLoadingText(LoadingStates.NOTIFYING_USER)
+                });
+                const notifyUserTimeout = setTimeout(self => {
+                    self.beginListenForCallConnected();
+                    self.setState({ 
+                        loadingState: LoadingStates.DIALING,
+                        loadingText: self.getLoadingText(LoadingStates.DIALING)
+                    });
+                }, NOTIFY_USER_TIMEOUT, this);
+                timerHandles.push(notifyUserTimeout);
+            },
+            errorMessage => {
+                alert(errorMessage);
+            }
+        );
     }
 
     componentWillUnmount() {
@@ -70,7 +70,7 @@ export class PhoneCall extends AuthenticatedComponent {
         });
     }
 
-    beginListenForCallEnded = () => {
+    beginListenForCallConnected = () => {
         incomingMessageChannel = this.getIncomingMessageChannel();
         incomingMessageChannel.bind('call-begin', event => {
             this.setState({
@@ -142,7 +142,14 @@ export class PhoneCall extends AuthenticatedComponent {
     }
 
     submitRating = () => {
-
+        submitCallRating(this.state.callId, this.state.selectedRating).then(
+            _ => {
+                this.goTo('Home');
+            },
+            _ => {
+                alert('There was a problem submitting your rating.');
+            }
+        )
     }
 
     render() {
