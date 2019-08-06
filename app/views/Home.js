@@ -49,7 +49,7 @@ export class Home extends React.Component {
 
     authenticated = async () => {
         const socketRecieveId = await getSocketReceiveId();
-        const socket = getPusherInstance();
+        const socket = getPusherInstance(); 
         const incomingMessageChannel = socket.subscribe(socketRecieveId);
 
         this.setState({ 
