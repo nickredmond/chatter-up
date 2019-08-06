@@ -21,20 +21,28 @@ export class InstantMessage extends AuthenticatedComponent {
         messages: []
     };
 
+    this.props.navigation.addListener(
+        'didBlur',
+        _ => {
+          this.state.messageSocket.disconnect();
+        }
+    );
+
     getUsername().then(
         username => {
             this.setState({ username });
+            this.beginListenForMessages();
         },
         errorMessage => { 
             alert(errorMessage);
         }
     );
-    
+  }
+
+  beginListenForMessages = () => {
     const channelId = this.props.navigation.getParam('channelId');
-    
-    
     if (channelId) {
-        this.state = { channelId, isLoading: true };
+        this.setState({ channelId, isLoading: true });
         this.getExistingMessages(channelId);
         this.initializeMessageListener(channelId);
     }
@@ -56,9 +64,22 @@ export class InstantMessage extends AuthenticatedComponent {
 
   initializeMessageListener = (channelId) => {
     const socket = getPusherInstance();
-    const channel = socket.subscribe(channelId);
+    this.setState({ messageSocket: socket });
+
+    const messageChannel = socket.subscribe(channelId);
     
-    channel.bind('message', message => {
+    // const messageListener = (message) => {
+    //     if (message.sentBy !== this.state.username) {
+    //         const uiMessage = {
+    //             direction: 'left',
+    //             dateSent: message.dateSent,
+    //             text: message.content
+    //         };
+    //         this.setState({ messages: this.state.messages.concat([uiMessage]) });
+    //     }
+    // };
+    // this.setState({ messageChannel, messageListener });
+    messageChannel.bind('message', (message) => {
         if (message.sentBy !== this.state.username) {
             const uiMessage = {
                 direction: 'left',
@@ -115,18 +136,24 @@ export class InstantMessage extends AuthenticatedComponent {
   //When the keyboard appears, this gets the ScrollView to move the end back "up" so the last message is visible with the keyboard up
   //Without this, whatever message is the keyboard's height from the bottom will look like the last message.
   keyboardDidShow (e) {
-    this.scrollView.scrollToEnd();
+    if (this.scrollView) {
+      this.scrollView.scrollToEnd();
+    }
   }
 
   //When the keyboard dissapears, this gets the ScrollView to move the last message back down.
   keyboardDidHide (e) {
-    this.scrollView.scrollToEnd();
+    if (this.scrollView) {
+      this.scrollView.scrollToEnd();
+    }
   }
 
   //scroll to bottom when first showing the view
   componentDidMount() {
     setTimeout(function() {
-      this.scrollView.scrollToEnd();
+      if (this.scrollView) {
+        this.scrollView.scrollToEnd();
+      }
     }.bind(this))
   }
 
@@ -134,7 +161,9 @@ export class InstantMessage extends AuthenticatedComponent {
   //the component could update for other reasons, for which we wouldn't want it to scroll to the bottom.
   componentDidUpdate() {
     setTimeout(function() {
-      this.scrollView.scrollToEnd();
+      if (this.scrollView) {
+        this.scrollView.scrollToEnd();
+      }
     }.bind(this))
   }
 
@@ -162,7 +191,9 @@ export class InstantMessage extends AuthenticatedComponent {
   //The real solution here is probably a fork of AutogrowInput that can provide this information.
   _onInputSizeChange() {
     setTimeout(function() {
-      this.scrollView.scrollToEnd({animated: false});
+      if (this.scrollView) {
+        this.scrollView.scrollToEnd({animated: false});
+      }
     }.bind(this))
   }
 

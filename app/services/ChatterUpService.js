@@ -203,3 +203,8 @@ export const submitCallRating = (callId, rating) => {
     const hasResponse = false;
     return sendAuthenticatedRequest('/call/' + callId + '/rate', { rating }, hasResponse);
 }
+
+export const sendSupportRequest = (description) => {
+    const hasResponse = false;
+    return sendAuthenticatedRequest('/contact', { description }, hasResponse);
+}

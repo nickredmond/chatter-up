@@ -126,7 +126,8 @@ export class Home extends React.Component {
                     this.state.isAuthenticated && 
                     <IncomingCallOverlay 
                         navigation={this.props.navigation}
-                        incomingCallChannel={this.state.incomingMessageChannel}>
+                        incomingCallChannel={this.state.incomingMessageChannel}
+                        isEntryPoint={true}>
                     </IncomingCallOverlay>
                 }
             </View>

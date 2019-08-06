@@ -8,6 +8,7 @@ import { PhoneCall } from './app/views/PhoneCall';
 import { Support } from './app/views/support/Support';
 import { Report } from './app/views/support/Report';
 import { Block } from './app/views/support/Block';
+import { Contact } from './app/views/support/Contact';
 import { ReportConfirmed } from './app/views/support/ReportConfirmed';
 import { BlockConfirmed } from './app/views/support/BlockConfirmed';
 import { AboutMe } from './app/views/setup/AboutMe';
@@ -35,6 +36,7 @@ const AppRoutes = createStackNavigator(
     ReportConfirmed,
     Block,
     BlockConfirmed,
+    Contact,
 
     UserProfile: {
       screen: UserProfile,

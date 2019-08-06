@@ -10,34 +10,46 @@ const screenHeight = Dimensions.get('window').height;
 export class IncomingCallOverlay extends React.Component {
     constructor(props) {
         super(props);
+        this.state = {};
         
         // this.state = {
         //     visible: true,
         //     phoneNumber: '19289253113',
         //     username: 'littlesg54'
         // };
+        //this.props.incomingCallChannel.bind('incoming-call', this.state.incomingCallHandler);
+    }
 
-        const incomingCallHandler = (incomingCallMessage) => {
+    componentDidMount () {
+        const incomingCallHandler = this.getIncomingCallHandler();
+        this.setState({ visible: false, incomingCallHandler });
+        if (this.props.isEntryPoint) { // Home doesn't call onBlur (after login)
+            this.props.incomingCallChannel.bind('incoming-call', this.state.incomingCallHandler);
+        }
+
+        this.props.navigation.addListener(
+            'didBlur',
+            _ => {
+                this.props.incomingCallChannel.unbind(null, this.state.incomingCallHandler);
+            }
+        );
+        this.props.navigation.addListener(
+            'didFocus',
+            _ => {
+                this.props.incomingCallChannel.bind('incoming-call', this.state.incomingCallHandler);
+            }
+        );
+    }
+
+    getIncomingCallHandler = () => {
+        return (incomingCallMessage) => {
             this.setState({
                 visible: true,
                 phoneNumber: incomingCallMessage.phoneNumber,
                 username: incomingCallMessage.username
             });
         };
-        this.state = { visible: false, incomingCallHandler };
-
-        this.props.incomingCallChannel.bind('incoming-call', incomingCallHandler);
     }
-
-    // todo: this isn't working and isn't preventing more connections from being made, I think
-    componentDidMount () {
-        this.props.navigation.addListener(
-            'didBlur',
-            _ => {
-                this.props.incomingCallChannel.unbind('incoming-call', this.state.incomingCallHandler);
-            }
-        );
-     }
 
     getIncomingCallMessage = () => {
         const formattedNumber = getFormattedPhoneNumber(this.state.phoneNumber);
