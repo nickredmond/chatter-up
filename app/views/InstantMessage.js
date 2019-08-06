@@ -67,18 +67,6 @@ export class InstantMessage extends AuthenticatedComponent {
     this.setState({ messageSocket: socket });
 
     const messageChannel = socket.subscribe(channelId);
-    
-    // const messageListener = (message) => {
-    //     if (message.sentBy !== this.state.username) {
-    //         const uiMessage = {
-    //             direction: 'left',
-    //             dateSent: message.dateSent,
-    //             text: message.content
-    //         };
-    //         this.setState({ messages: this.state.messages.concat([uiMessage]) });
-    //     }
-    // };
-    // this.setState({ messageChannel, messageListener });
     messageChannel.bind('message', (message) => {
         if (message.sentBy !== this.state.username) {
             const uiMessage = {

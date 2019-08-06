@@ -40,10 +40,8 @@ export class Home extends React.Component {
     }
 
     componentWillUnmount() {
-        const socket = this.state.socket;
-        const socketRecieveId = this.state.socketRecieveId;
-        if (socket && socketRecieveId) {
-            socket.unsubscribe(socketRecieveId);
+        if (this.state && this.state.messageSocket) {
+            this.state.messageSocket.disconnect();
         }
     }
 
@@ -55,8 +53,7 @@ export class Home extends React.Component {
         this.setState({ 
             isAuthenticated: true, 
             isLoading: false,
-            socket, 
-            socketRecieveId,
+            messageSocket: socket, 
             incomingMessageChannel
         });
     }
@@ -74,6 +71,7 @@ export class Home extends React.Component {
     }
     
     loggedOut = () => {
+        this.state.messageSocket.disconnect();
         this.setState({ isAuthenticated: false });
     }
 
