@@ -4,10 +4,11 @@ import { AuthenticatedComponent } from '../shared/AuthenticatedComponent';
 import { ChatterUpLoadingSpinner } from './partial/ChatterUpLoadingSpinner';
 import { IncomingCallOverlay } from '../shared/IncomingCallOverlay';
 import { initializeCall, submitCallRating } from '../services/ChatterUpService';
-import { getFormattedPhoneNumber } from '../shared/Constants';
+import { getFormattedPhoneNumber, getPusherInstance } from '../shared/Constants';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { Icon } from 'react-native-elements';
 import moment from 'moment';
+import { getSocketReceiveId } from '../services/AuthService';
 
 const NOTIFY_USER_TIMEOUT = 3000;
 const LoadingStates = {
@@ -38,6 +39,13 @@ export class PhoneCall extends AuthenticatedComponent {
             ratingTextStyle_great: styles.unselectedRatingText,
             iconColor_great: '#efefef',
         };
+
+        this.props.navigation.addListener(
+            'didBlur',
+            _ => {
+              this.state.callSocket.disconnect();
+            }
+        );
         
         initializeCall(otherUsername).then(
             virtualNumber => {
@@ -47,7 +55,9 @@ export class PhoneCall extends AuthenticatedComponent {
                     loadingText: this.getLoadingText(LoadingStates.NOTIFYING_USER)
                 });
                 const notifyUserTimeout = setTimeout(self => {
-                    self.beginListenForCallConnected();
+                    self.beginListenForCallConnected().catch(_ => {
+                        alert('There was a problem getting call information.');
+                    });
                     self.setState({ 
                         loadingState: LoadingStates.DIALING,
                         loadingText: self.getLoadingText(LoadingStates.DIALING)
@@ -70,16 +80,17 @@ export class PhoneCall extends AuthenticatedComponent {
         });
     }
 
-    beginListenForCallConnected = () => {
-        incomingMessageChannel = this.getIncomingMessageChannel();
+    beginListenForCallConnected = async () => {
+        const socketRecieveId = await getSocketReceiveId();
+        const socket = getPusherInstance(); 
+        this.setState({ callSocket: socket });
+
+        const incomingMessageChannel = socket.subscribe(socketRecieveId);
         incomingMessageChannel.bind('call-begin', event => {
             this.setState({
                 loadingState: LoadingStates.CALL_BEGAN,
                 callId: event.callId
             });
-            if (incomingMessageChannel) {
-                incomingMessageChannel.unbind('call-begin');
-            }
         });
     }
 
