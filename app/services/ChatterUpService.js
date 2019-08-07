@@ -204,6 +204,11 @@ export const submitCallRating = (callId, rating) => {
     return sendAuthenticatedRequest('/call/' + callId + '/rate', { rating }, hasResponse);
 }
 
+export const releaseVirtualNumber = (virtualNumber) => {
+    const hasResponse = false;
+    return sendAuthenticatedRequest('/virtualNumber/release', { virtualNumber }, hasResponse);
+}
+
 export const sendSupportRequest = (description) => {
     const hasResponse = false;
     return sendAuthenticatedRequest('/contact', { description }, hasResponse);

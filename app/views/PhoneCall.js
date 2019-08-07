@@ -3,7 +3,7 @@ import { View, StyleSheet, Text, Linking } from 'react-native';
 import { AuthenticatedComponent } from '../shared/AuthenticatedComponent';
 import { ChatterUpLoadingSpinner } from './partial/ChatterUpLoadingSpinner';
 import { IncomingCallOverlay } from '../shared/IncomingCallOverlay';
-import { initializeCall, submitCallRating } from '../services/ChatterUpService';
+import { initializeCall, submitCallRating, releaseVirtualNumber } from '../services/ChatterUpService';
 import { getFormattedPhoneNumber, getPusherInstance } from '../shared/Constants';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { Icon } from 'react-native-elements';
@@ -43,7 +43,12 @@ export class PhoneCall extends AuthenticatedComponent {
         this.props.navigation.addListener(
             'didBlur',
             _ => {
-              this.state.callSocket.disconnect();
+                releaseVirtualNumber(this.state.virtualNumber).catch(_ => {
+                    // todo: send errors to logging server rather than alert()
+                    // also, maybe handle critical errors (not this) with graceful error page
+                    alert('Error releasing virtual number!');
+                });
+                this.state.callSocket.disconnect();
             }
         );
         
@@ -153,9 +158,11 @@ export class PhoneCall extends AuthenticatedComponent {
     }
 
     submitRating = () => {
+        this.setState({ submittingRating: true });
         submitCallRating(this.state.callId, this.state.selectedRating).then(
             _ => {
-                this.goTo('Home');
+                this.setState({ submittingRating: false, submittedRating: true });
+                setTimeout(() => { this.goTo('Home'); }, 1000);
             },
             _ => {
                 alert('There was a problem submitting your rating.');
@@ -225,13 +232,21 @@ export class PhoneCall extends AuthenticatedComponent {
                         </View>
 
                         {
-                            this.state.selectedRating && 
+                            this.state.selectedRating && !(this.state.submittingRating || this.state.submittedRating) &&
                             <TouchableOpacity 
                                 style={[styles.button, styles.submitRatingButton]}
                                 onPress={this.submitRating}
                                 >
                                 <Text style={styles.submitRatingButtonText}>{'submit rating'}</Text>
                             </TouchableOpacity>
+                        }
+                        {
+                            this.state.submittingRating && 
+                            <ChatterUpLoadingSpinner></ChatterUpLoadingSpinner>
+                        }
+                        {
+                            this.state.submittedRating && 
+                            <Text style={styles.subtext}>{'rating sumbitted'}</Text>
                         }
                     </View>
                 }
