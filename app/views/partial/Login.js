@@ -86,9 +86,11 @@ export class Login extends React.Component {
                         this.setPageError('Could not find user with that username.');
                     }
                 },
-                () => {
+                error => {
                     this.setProcessingAction(false);
-                    this.setPageError('There was a problem logging in.');
+                    if (error && error.isSuspended) {
+                        this.props.suspended();
+                    }
                 }
             );
         }

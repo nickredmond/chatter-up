@@ -88,6 +88,10 @@ export class Home extends React.Component {
         this.goTo('AboutMe');
     }
 
+    suspendedAccount = () => {
+        this.goTo('Suspended');
+    }
+
     goTo = (viewName, navigationParams) => {
         const { navigate } = this.props.navigation;
         const params = navigationParams || {};
@@ -121,7 +125,8 @@ export class Home extends React.Component {
                         !(this.state.isLoading || this.state.isAuthenticated) && 
                         <Login 
                             createdUser={this.createdUser}
-                            loggedIn={(response) => this.loggedIn(response)}>
+                            loggedIn={(response) => this.loggedIn(response)}
+                            suspended={this.suspendedAccount}>
                         </Login>
                     }
                 </View>

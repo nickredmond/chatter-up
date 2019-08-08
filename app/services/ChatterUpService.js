@@ -1,6 +1,7 @@
 import { AsyncStorage } from 'react-native';
 import { getApiUrl, getPusherInstance } from '../shared/Constants';
 import { getUserToken, authenticate } from './AuthService';
+import { SUSPENDED_STATUS } from '../shared/Constants';
 
 export const sendAuthenticatedRequest = (path, body, hasResponse) => {
     return new Promise((resolve, reject) => {
@@ -26,6 +27,9 @@ export const sendAuthenticatedRequest = (path, body, hasResponse) => {
                             else {
                                 resolve(true);
                             }
+                        }
+                        else if (response.status === SUSPENDED_STATUS) {
+                            reject({ isSuspended: true });
                         }
                         else {
                             reject('There was a problem communicating with server');
@@ -74,8 +78,8 @@ export const openChatConnection = (username) => {
             response => {
                 resolve(response.channelId);
             },
-            _ => {
-                reject('There was a problem connecting to chat :(');
+            error => {
+                reject(error);
             }
         );
     });
@@ -125,8 +129,8 @@ export const initializeCall = (username) => {
             response => {
                 resolve(response.virtualNumber);
             },
-            _ => {
-                reject('There was a problem connecting the call :(');
+            error => {
+                reject(error);
             }
         );
     });

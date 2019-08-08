@@ -1,5 +1,5 @@
 import { AsyncStorage } from 'react-native';
-import { getApiUrl } from '../shared/Constants';
+import { getApiUrl, SUSPENDED_STATUS } from '../shared/Constants';
 
 // todo: refresh token periodically
 export const authenticate = () => {
@@ -135,6 +135,9 @@ export const logIn = (username, password) => {
                     response.json().then(responseBody => {
                         saveAuthResponseData(username, responseBody, resolve, reject);
                     });
+                }
+                else if (response.status === SUSPENDED_STATUS) {
+                    reject({ isSuspended: true });
                 }
                 else if (response.status === 400 || response.status === 401) {
                     response.json().then(err => {
