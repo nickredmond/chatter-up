@@ -35,8 +35,13 @@ export class Block extends AuthenticatedComponent {
                 _ => {
                     this.goTo('BlockConfirmed');
                 },
-                _ => {
-                    alert('There was a problem sending your request to block user.');
+                error => {
+                    if (error && error.isSuspended) {
+                        this.goTo('Suspended');
+                    }
+                    else {
+                        alert('There was a problem sending your request to block user.');
+                    }
                 }
             )
         }

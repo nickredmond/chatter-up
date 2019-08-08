@@ -18,8 +18,13 @@ export class MainMenu extends React.Component {
             quote => {
                 this.setState({ quote });
             },
-            errorMessage => {
-                alert(errorMessage);
+            error => {
+                if (error && error.isSuspended) {
+                    alert('Your account has been suspended.');
+                }
+                else {
+                    alert('There was a problem retrieving random quote.');   
+                }
             }
         );
     }

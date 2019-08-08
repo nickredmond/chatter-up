@@ -28,8 +28,13 @@ export class Report extends AuthenticatedComponent {
                 const categoriesWithDefault = [this.state.defaultCategory].concat(categories);
                 this.setState({ categories: categoriesWithDefault });
             },
-            errorMessage => {
-                alert(errorMessage);
+            error => {
+                if (error && error.isSuspended) {
+                    this.goTo('Suspended');
+                }
+                else {
+                    alert('There was a problem initializing the report form.');
+                }
             }
         )
     }
@@ -96,8 +101,13 @@ export class Report extends AuthenticatedComponent {
                 _ => {
                     this.goTo('ReportConfirmed');
                 },
-                errorMessage => {
-                    alert(errorMessage);
+                error => {
+                    if (error && error.isSuspended) {
+                        this.goTo('Suspended');
+                    }
+                    else {
+                        alert('There was a problem submitting your user report.');
+                    }
                 }
             );
         }

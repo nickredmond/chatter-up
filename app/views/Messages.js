@@ -25,8 +25,13 @@ export class Messages extends AuthenticatedComponent {
                     isLoading: false
                 });
             },
-            errorMessage => {
-                alert(errorMessage);
+            error => {
+                if (error && error.isSuspended) {
+                    this.goTo('Suspended');
+                }
+                else {
+                    alert('There was a problem retrieving messages.');   
+                }
             }
         )
     }

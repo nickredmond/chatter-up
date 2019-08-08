@@ -47,8 +47,13 @@ export class UsernameCheck extends React.Component {
                         searchingUsername: false
                     });
                 },
-                _ => {
-                    alert('There was a problem checking username. ');
+                error => {
+                    if (error && error.isSuspended) {
+                        alert('Your account has been suspended.');
+                    }
+                    else {
+                        alert('There was a problem checking username value.');   
+                    }
                 }
             );
         }

@@ -13,6 +13,7 @@ import { ReportConfirmed } from './app/views/support/ReportConfirmed';
 import { BlockConfirmed } from './app/views/support/BlockConfirmed';
 import { AboutMe } from './app/views/setup/AboutMe';
 import { PhoneNumberConfirmation } from './app/views/setup/PhoneNumberConfirmation';
+import { Suspended } from './app/views/Suspended';
 
 const getTrimmedUsernameTitle = (username) => {
   return username.length > 16 ? username.substring(0, 15) + '...' : username;
@@ -37,6 +38,8 @@ const AppRoutes = createStackNavigator(
     Block,
     BlockConfirmed,
     Contact,
+
+    Suspended,
 
     UserProfile: {
       screen: UserProfile,

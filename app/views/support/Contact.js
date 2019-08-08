@@ -38,8 +38,13 @@ export class Contact extends AuthenticatedComponent {
                 _ => {
                     this.setState({ submitting: false, submitted: true });
                 },
-                _ => {
-                    alert('There was a problem submitting your request.');
+                error => {
+                    if (error && error.isSuspended) {
+                        this.goTo('Suspended');
+                    }
+                    else {
+                        alert('There was a problem submitting your request.');
+                    }
                 }
             )
         }

@@ -43,10 +43,15 @@ export class PhoneCall extends AuthenticatedComponent {
         this.props.navigation.addListener(
             'didBlur',
             _ => {
-                releaseVirtualNumber(this.state.virtualNumber).catch(_ => {
+                releaseVirtualNumber(this.state.virtualNumber).catch(error => {
                     // todo: send errors to logging server rather than alert()
                     // also, maybe handle critical errors (not this) with graceful error page
-                    alert('Error releasing virtual number!');
+                    if (error && error.isSuspended) {
+                        this.goTo('Suspended');
+                    }
+                    else {
+                        alert('Error releasing virtual number!');
+                    }
                 });
                 this.state.callSocket.disconnect();
             }
@@ -70,8 +75,13 @@ export class PhoneCall extends AuthenticatedComponent {
                 }, NOTIFY_USER_TIMEOUT, this);
                 timerHandles.push(notifyUserTimeout);
             },
-            errorMessage => {
-                alert(errorMessage);
+            error => {
+                if (error && error.isSuspended) {
+                    this.goTo('Suspended');
+                }
+                else {
+                    alert('There was a problem initializing the phone call.');
+                }
             }
         );
     }
@@ -164,8 +174,13 @@ export class PhoneCall extends AuthenticatedComponent {
                 this.setState({ submittingRating: false, submittedRating: true });
                 setTimeout(() => { this.goTo('Home'); }, 1000);
             },
-            _ => {
-                alert('There was a problem submitting your rating.');
+            error => {
+                if (error && error.isSuspended) {
+                    this.goTo('Suspended');
+                }
+                else {
+                    alert('There was a problem submitting your rating.');
+                }
             }
         )
     }

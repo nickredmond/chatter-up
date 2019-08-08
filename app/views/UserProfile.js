@@ -41,8 +41,13 @@ export class UserProfile extends AuthenticatedComponent {
             userInfo => {
                 this.setState({ userInfo, isLoading: false });
             },
-            errorMessage => { 
-                alert(errorMessage);
+            error => { 
+                if (error && error.isSuspended) {
+                    this.goTo('Suspended');
+                }
+                else {
+                    alert('There was a problem getting user profile info.');   
+                }
             }
         );
     }
@@ -94,8 +99,13 @@ export class UserProfile extends AuthenticatedComponent {
     aboutMeSavePressed = () => {
         const updatedUserInfo = this.state.userInfo;
         updatedUserInfo.about = this.state.updatedAboutMeText;
-        submitAboutMe(updatedUserInfo.about).catch(_ => {
-            alert('There was a problem updating your profile.');
+        submitAboutMe(updatedUserInfo.about).catch(error => {
+            if (error && error.isSuspended) {
+                this.goTo('Suspended');
+            }
+            else {
+                alert('There was a problem updating your profile.');
+            }
         });
 
         this.setState({
@@ -111,13 +121,6 @@ export class UserProfile extends AuthenticatedComponent {
 
     dismissBadgeInfo = () => {
         this.setState({ selectedBadge: null });
-    }
-
-    getBadgeColor = (badgeName) => {
-        alert('eh')
-        const isSelectedBadge = this.state.selectedBadge && this.state.selectedBadge.name === badgeName;
-        if (isSelectedBadge) {alert('booya')}
-        return isSelectedBadge ? '#88ff88' : '#efefef';
     }
 
     getPhoneEnabledSubtext = () => {
@@ -136,8 +139,13 @@ export class UserProfile extends AuthenticatedComponent {
         userInfo.canBeCalled = value;
         this.setState({ userInfo });
 
-        setPhoneCallsEnabled(value).catch(_ => {
-            alert('There was a problem updating your profile.');
+        setPhoneCallsEnabled(value).catch(error => {
+            if (error && error.isSuspended) {
+                this.goTo('Suspended');
+            }
+            else {
+                alert('There was a problem updating your profile.');
+            }
         });
     }
 

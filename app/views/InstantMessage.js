@@ -55,8 +55,13 @@ export class InstantMessage extends AuthenticatedComponent {
                 this.getExistingMessages(channelId);
                 this.initializeMessageListener(channelId);
             },
-            errorMessage => {
-                alert(errorMessage);
+            error => {
+              if (error && error.isSuspended) {
+                this.goTo('Suspended');
+              }
+              else {
+                alert('There was a problem connecting to IM with other user.');
+              }
             }
         );
     }
@@ -100,8 +105,13 @@ export class InstantMessage extends AuthenticatedComponent {
                 isLoading: false
             });
         },
-        errorMessage => {
-            alert(errorMessage);
+        error => {
+          if (error && error.isSuspended) {
+            this.goTo('Suspended');
+          }
+          else {
+             alert('There was a problem retrieving messages.'); 
+          }
         }
     );
   }
@@ -167,8 +177,13 @@ export class InstantMessage extends AuthenticatedComponent {
 
     sendMessage(this.state.channelId, sanitizedText).then(
         _ => {},
-        errorMessage => {
-            alert(errorMessage);
+        error => {
+          if (error && error.isSuspended) {
+            this.goTo('Suspended');
+          }
+          else {
+            alert('There was a problem sending your message.');   
+          }
         }
     );
   }

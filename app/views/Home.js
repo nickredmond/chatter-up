@@ -39,6 +39,12 @@ export class Home extends React.Component {
             });
     }
 
+    componentWillReceiveProps(props) {
+        if (props.navigation.state.params.loggedOut) {
+            this.loggedOut();
+        }
+    }
+
     componentWillUnmount() {
         if (this.state && this.state.messageSocket) {
             this.state.messageSocket.disconnect();

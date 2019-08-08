@@ -20,8 +20,13 @@ export class Chat extends AuthenticatedComponent {
             users => {
                 this.setState({ users, isLoading: false });
             },
-            errorMessage => {
-                alert(errorMessage);
+            error => {
+                if (error && error.isSuspended) {
+                    this.goTo('Suspended');
+                }
+                else {
+                    alert('There was a problem fetching users.');
+                }
             }
         );
     }

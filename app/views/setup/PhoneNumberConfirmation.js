@@ -88,7 +88,7 @@ export class PhoneNumberConfirmation extends AuthenticatedComponent {
                             });
                         }
                         else {
-                            alert(error);
+                            alert('There was a problem saving your phone number.');
                         }
                     }
                 );
