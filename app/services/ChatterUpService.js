@@ -1,7 +1,7 @@
 import { AsyncStorage } from 'react-native';
 import { getApiUrl, getPusherInstance } from '../shared/Constants';
 import { getUserToken, authenticate } from './AuthService';
-import { SUSPENDED_STATUS } from '../shared/Constants';
+import { SUSPENDED_STATUS, CALLS_TEMPORARILY_UNAVAILABLE_STATUS } from '../shared/Constants';
 
 export const sendAuthenticatedRequest = (path, body, hasResponse) => {
     return new Promise((resolve, reject) => {
@@ -30,6 +30,9 @@ export const sendAuthenticatedRequest = (path, body, hasResponse) => {
                         }
                         else if (response.status === SUSPENDED_STATUS) {
                             reject({ isSuspended: true });
+                        }
+                        else if (response.status === CALLS_TEMPORARILY_UNAVAILABLE_STATUS) {
+                            reject({ areCallsUnavailable: true });
                         }
                         else {
                             reject('There was a problem communicating with server');
@@ -216,4 +219,8 @@ export const releaseVirtualNumber = (virtualNumber) => {
 export const sendSupportRequest = (description) => {
     const hasResponse = false;
     return sendAuthenticatedRequest('/contact', { description }, hasResponse);
+}
+
+export const getFaqs = () => {
+    return sendAuthenticatedRequest('/faq');
 }

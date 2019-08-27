@@ -158,7 +158,7 @@ export class UserProfile extends AuthenticatedComponent {
                     size={60} 
                     style={styles.badgeIcon} 
                     name={iconName} 
-                    type='material' 
+                    type={badge.iconSet} 
                     color={'#efefef'}>
                 </Icon>
             </TouchableOpacity>
@@ -256,7 +256,7 @@ export class UserProfile extends AuthenticatedComponent {
                                         size={28} 
                                         style={styles.badgeInfoIcon}
                                         name={this.state.selectedBadge.icon} 
-                                        type='material' 
+                                        type={this.state.selectedBadge.iconSet} 
                                         color={'#222'}>
                                     </Icon>
                                     <Text style={styles.badgeInfoName}>{this.state.selectedBadge.name}</Text>

@@ -1,6 +1,7 @@
 import Pusher from 'pusher-js/react-native';
 
 export const SUSPENDED_STATUS = 497;
+export const CALLS_TEMPORARILY_UNAVAILABLE_STATUS = 565;
 
 export const getApiUrl = () => {
     return 'https://talk-it-out-api.herokuapp.com';

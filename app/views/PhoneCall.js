@@ -43,17 +43,19 @@ export class PhoneCall extends AuthenticatedComponent {
         this.props.navigation.addListener(
             'didBlur',
             _ => {
-                releaseVirtualNumber(this.state.virtualNumber).catch(error => {
-                    // todo: send errors to logging server rather than alert()
-                    // also, maybe handle critical errors (not this) with graceful error page
-                    if (error && error.isSuspended) {
-                        this.goTo('Suspended');
-                    }
-                    else {
-                        alert('Error releasing virtual number!');
-                    }
-                });
-                this.state.callSocket.disconnect();
+                if (!this.state.areCallsUnavailable) {
+                    releaseVirtualNumber(this.state.virtualNumber).catch(error => {
+                        // todo: send errors to logging server rather than alert()
+                        // also, maybe handle critical errors (not this) with graceful error page
+                        if (error && error.isSuspended) {
+                            this.goTo('Suspended');
+                        }
+                        else {
+                            alert('Error releasing virtual number!');
+                        }
+                    });
+                    this.state.callSocket.disconnect();
+                }
             }
         );
         
@@ -78,6 +80,9 @@ export class PhoneCall extends AuthenticatedComponent {
             error => {
                 if (error && error.isSuspended) {
                     this.goTo('Suspended');
+                }
+                else if (error && error.areCallsUnavailable) {
+                    this.setState({ areCallsUnavailable: true })
                 }
                 else {
                     alert('There was a problem initializing the phone call.');
@@ -185,102 +190,122 @@ export class PhoneCall extends AuthenticatedComponent {
         )
     }
 
+    getCallsUnavailableDescription = () => {
+        return 'TalkItOut is experiencing a much higher call volume than expected. This is ' + 
+            'good news for all of us because it likely means the app is growing in popularity, ' +
+            'and unfortunately phone calls are temporarily disabled while we upgrade TalkItOut ' + 
+            'so it can meet the new demand. We will hopefully have service restored within ' + 
+            '24-72 hours. Please feel free to reach out to us in the meantime with any questions ' + 
+            'you have. You can reach out to us via the "contact" form in "support" menu.';
+    }
+
     render() {
-        return (
-            <View style={styles.container}>
-                {
-                    this.state.loadingState !== LoadingStates.CALL_BEGAN && 
-                    <View style={styles.loadingView}>
-                        <Text style={styles.loadingText}>{this.state.loadingText}</Text>
-                        {
-                            this.state.loadingState !== LoadingStates.DIALING && 
-                            <ChatterUpLoadingSpinner></ChatterUpLoadingSpinner>
-                        }
-                        {
-                            this.state.loadingState === LoadingStates.DIALING && 
-                            <View>
-                                <Text style={styles.subtext}>{this.getNumberText()}</Text>
-                                <Text style={styles.subtext}>{this.getUserText()}</Text>
-                            </View>
-                        }
-
-                        {
-                            this.state.loadingState === LoadingStates.DIALING && 
-                            <TouchableOpacity 
-                                style={[styles.button, styles.callButton]}
-                                onPress={this.dialNumber}
-                                >
-                                <Icon size={28} name='phone' type='font-awesome' color='#efefef' />
-                                <Text style={[styles.buttonText, styles.callButtonText]}>{'dial'}</Text>
-                            </TouchableOpacity>
-                        }
-                    </View>
-                }
-
-                {
-                    this.state.loadingState === LoadingStates.CALL_BEGAN && 
-                    <View style={styles.loadingView}>
-                        <Text style={styles.loadingText}>{'call connected'}</Text>
-                        <Text style={styles.subtext}>{'How do you rate the person you talked with?'}</Text>
-                        <View style={styles.ratingContainer}>
-                            <TouchableOpacity 
-                                style={[styles.ratingButton, this.state.ratingButtonStyle_ok]}
-                                onPress={() => this.ratingPressed('ok')}
-                                >
-                                <Icon size={36} name='emoticon-neutral-outline' type='material-community' color={this.state.iconColor_ok} />
-                                <Text style={[styles.ratingText, this.state.ratingTextStyle_ok]}>{'ok'}</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity 
-                                style={[styles.ratingButton, this.state.ratingButtonStyle_good]}
-                                onPress={() => this.ratingPressed('good')}
-                                >
-                                <Icon size={36} name='emoticon-happy-outline' type='material-community' color={this.state.iconColor_good} />
-                                <Text style={[styles.ratingText, this.state.ratingTextStyle_good]}>{'good'}</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity 
-                                style={[styles.ratingButton, this.state.ratingButtonStyle_great]}
-                                onPress={() => this.ratingPressed('great')}
-                                >
-                                <Icon size={36} name='emoticon-excited-outline' type='material-community' color={this.state.iconColor_great} />
-                                <Text style={[styles.ratingText, this.state.ratingTextStyle_great]}>{'great'}</Text>
-                            </TouchableOpacity>
+        if (this.state.areCallsUnavailable) {
+            return (
+                <View style={styles.container}>
+                    <Text style={styles.callsUnavailableTitle}>{'Oh no!'}</Text>
+                    <Text style={styles.callsUnavailableSubtitle}>{'Phone calls are temporarily unavailable.'}</Text>
+                    <Text style={styles.callsUnavailableDescription}>{this.getCallsUnavailableDescription()}</Text>
+                </View>
+            );
+        }
+        else {
+            return (
+                <View style={styles.container}>
+                    {
+                        this.state.loadingState !== LoadingStates.CALL_BEGAN && 
+                        <View style={styles.loadingView}>
+                            <Text style={styles.loadingText}>{this.state.loadingText}</Text>
+                            {
+                                this.state.loadingState !== LoadingStates.DIALING && 
+                                <ChatterUpLoadingSpinner></ChatterUpLoadingSpinner>
+                            }
+                            {
+                                this.state.loadingState === LoadingStates.DIALING && 
+                                <View>
+                                    <Text style={styles.subtext}>{this.getNumberText()}</Text>
+                                    <Text style={styles.subtext}>{this.getUserText()}</Text>
+                                </View>
+                            }
+    
+                            {
+                                this.state.loadingState === LoadingStates.DIALING && 
+                                <TouchableOpacity 
+                                    style={[styles.button, styles.callButton]}
+                                    onPress={this.dialNumber}
+                                    >
+                                    <Icon size={28} name='phone' type='font-awesome' color='#efefef' />
+                                    <Text style={[styles.buttonText, styles.callButtonText]}>{'dial'}</Text>
+                                </TouchableOpacity>
+                            }
                         </View>
-
-                        {
-                            this.state.selectedRating && !(this.state.submittingRating || this.state.submittedRating) &&
-                            <TouchableOpacity 
-                                style={[styles.button, styles.submitRatingButton]}
-                                onPress={this.submitRating}
-                                >
-                                <Text style={styles.submitRatingButtonText}>{'submit rating'}</Text>
-                            </TouchableOpacity>
-                        }
-                        {
-                            this.state.submittingRating && 
-                            <ChatterUpLoadingSpinner></ChatterUpLoadingSpinner>
-                        }
-                        {
-                            this.state.submittedRating && 
-                            <Text style={styles.subtext}>{'rating sumbitted'}</Text>
-                        }
-                    </View>
-                }
-
-                <TouchableOpacity 
-                    style={[styles.button, styles.homeButton]}
-                    onPress={() => this.goTo('Home')}
-                    >
-                    <Icon size={28} name='home' type='font-awesome' color='#222' />
-                    <Text style={[styles.buttonText, styles.homeButtonText]}>{'home'}</Text>
-                </TouchableOpacity>
-
-                {/* TODO: event: call started, Pusher to change to in-call view (v1.1?) */}
-                <IncomingCallOverlay 
-                    navigation={this.props.navigation}
-                    incomingCallChannel={this.getIncomingMessageChannel()}>
-                </IncomingCallOverlay>
-            </View>
-        );
+                    }
+    
+                    {
+                        this.state.loadingState === LoadingStates.CALL_BEGAN && 
+                        <View style={styles.loadingView}>
+                            <Text style={styles.loadingText}>{'call connected'}</Text>
+                            <Text style={styles.subtext}>{'How do you rate the person you talked with?'}</Text>
+                            <View style={styles.ratingContainer}>
+                                <TouchableOpacity 
+                                    style={[styles.ratingButton, this.state.ratingButtonStyle_ok]}
+                                    onPress={() => this.ratingPressed('ok')}
+                                    >
+                                    <Icon size={36} name='emoticon-neutral-outline' type='material-community' color={this.state.iconColor_ok} />
+                                    <Text style={[styles.ratingText, this.state.ratingTextStyle_ok]}>{'ok'}</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity 
+                                    style={[styles.ratingButton, this.state.ratingButtonStyle_good]}
+                                    onPress={() => this.ratingPressed('good')}
+                                    >
+                                    <Icon size={36} name='emoticon-happy-outline' type='material-community' color={this.state.iconColor_good} />
+                                    <Text style={[styles.ratingText, this.state.ratingTextStyle_good]}>{'good'}</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity 
+                                    style={[styles.ratingButton, this.state.ratingButtonStyle_great]}
+                                    onPress={() => this.ratingPressed('great')}
+                                    >
+                                    <Icon size={36} name='emoticon-excited-outline' type='material-community' color={this.state.iconColor_great} />
+                                    <Text style={[styles.ratingText, this.state.ratingTextStyle_great]}>{'great'}</Text>
+                                </TouchableOpacity>
+                            </View>
+    
+                            {
+                                this.state.selectedRating && !(this.state.submittingRating || this.state.submittedRating) &&
+                                <TouchableOpacity 
+                                    style={[styles.button, styles.submitRatingButton]}
+                                    onPress={this.submitRating}
+                                    >
+                                    <Text style={styles.submitRatingButtonText}>{'submit rating'}</Text>
+                                </TouchableOpacity>
+                            }
+                            {
+                                this.state.submittingRating && 
+                                <ChatterUpLoadingSpinner></ChatterUpLoadingSpinner>
+                            }
+                            {
+                                this.state.submittedRating && 
+                                <Text style={styles.subtext}>{'rating sumbitted'}</Text>
+                            }
+                        </View>
+                    }
+    
+                    <TouchableOpacity 
+                        style={[styles.button, styles.homeButton]}
+                        onPress={() => this.goTo('Home')}
+                        >
+                        <Icon size={28} name='home' type='font-awesome' color='#222' />
+                        <Text style={[styles.buttonText, styles.homeButtonText]}>{'home'}</Text>
+                    </TouchableOpacity>
+    
+                    {/* TODO: event: call started, Pusher to change to in-call view (v1.1?) */}
+                    <IncomingCallOverlay 
+                        navigation={this.props.navigation}
+                        incomingCallChannel={this.getIncomingMessageChannel()}>
+                    </IncomingCallOverlay>
+                </View>
+            );
+        }
     }
 }
 
@@ -373,5 +398,21 @@ const styles = StyleSheet.create({
     submitRatingButtonText: {
         fontSize: 24,
         color: '#efefef'
+    },
+
+    callsUnavailableTitle: {
+        color: '#efefef',
+        fontSize: 36
+    },
+    callsUnavailableSubtitle: {
+        color: '#ddd',
+        fontSize: 28,
+        paddingLeft: 10, 
+        paddingRight: 10
+    },
+    callsUnavailableDescription: {
+        color: '#ccc',
+        fontSize: 20,
+        padding: 10
     }
 });

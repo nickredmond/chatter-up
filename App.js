@@ -6,6 +6,7 @@ import { UserProfile } from './app/views/UserProfile';
 import { InstantMessage } from './app/views/InstantMessage';
 import { PhoneCall } from './app/views/PhoneCall';
 import { Support } from './app/views/support/Support';
+import { Faq } from './app/views/support/Faq';
 import { Report } from './app/views/support/Report';
 import { Block } from './app/views/support/Block';
 import { Contact } from './app/views/support/Contact';
@@ -33,6 +34,7 @@ const AppRoutes = createStackNavigator(
     PhoneNumberConfirmation,
 
     Support,
+    Faq,
     Report,
     ReportConfirmed,
     Block,
@@ -56,7 +58,7 @@ const AppRoutes = createStackNavigator(
     PhoneCall: {
       screen: PhoneCall,
       navigationOptions: ({ navigation }) => ({
-        title: 'in-call: ' + getTrimmedUsernameTitle(navigation.state.params.username)
+        title: 'call: ' + getTrimmedUsernameTitle(navigation.state.params.username)
       })
     }
   },
