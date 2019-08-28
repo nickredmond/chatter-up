@@ -27,8 +27,8 @@ export class Faq extends AuthenticatedComponent {
     renderFaq = ({ item: faq }) => {
         return (
             <View style={styles.faqItem}>
-                <Text style={styles.faqQuestion}>{faq.question}</Text>
-                <Text style={styles.faqAnswer}>{faq.answer}</Text>
+                <Text style={[styles.faqQuestion, styles.faqText]}>{faq.question}</Text>
+                <Text style={[styles.faqAnswer, styles.faqText]}>{faq.answer}</Text>
             </View>
         )
     }
@@ -56,12 +56,19 @@ const styles = StyleSheet.create({
         alignItems: 'center'
     },
     faqItem: {
-
+        backgroundColor: '#333',
+        marginBottom: 10,
+        marginLeft: 10,
+        marginRight: 10,
+        padding: 5
+    },
+    faqText: {
+        color: '#efef'
     },
     faqQuestion: {
-
+        fontSize: 24
     },
     faqAnswer: {
-
+        fontSize: 18
     }
 });
