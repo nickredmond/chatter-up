@@ -4,11 +4,11 @@ export const SUSPENDED_STATUS = 497;
 export const CALLS_TEMPORARILY_UNAVAILABLE_STATUS = 565;
 
 export const getApiUrl = () => {
-    return 'https://talk-it-out-api.herokuapp.com';
+    return 'https://talkingitiout.herokuapp.com';
 }
 
 export const getPusherInstance = () => {
-    return new Pusher('630d9da03c427eb6fac0', { cluster: 'us3' });
+    return new Pusher('19698cbd0d564804348c', { cluster: 'us3' });
 }
 
 /** strips leading '1' and formats with hyphens in American/Canadian format */
